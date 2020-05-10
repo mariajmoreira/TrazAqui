@@ -1,77 +1,90 @@
-package trazAqui;
+package trazaqui;
 
-public class LogVoluntario extends Voluntario {
+import java.util.ArrayList;
+
+public class LogVoluntario extends Voluntario{
     private String username;
     private String password;
     private boolean disponibilidade;
+    private ArrayList<Classificacao> classificacoes;
 
+    //getters
+    public String getUsername(){return username;}
+
+    public String getPassword(){return password;}
+
+    public boolean getDisponibilidade(){return disponibilidade;}
+
+    public ArrayList<Classificacao> getClassificacoes(){return new ArrayList<>(this.classificacoes);}
+
+    //setters
+    public void setUsername(String user){this.username=user;}
+
+    public void setPassword(String pass){this.password=pass;}
+
+    public void setDisponibilidade(boolean tf){this.disponibilidade=tf;}
+
+    public void setClassificacoes(ArrayList<Classificacao> cl){this.classificacoes=new ArrayList<>(cl);}
+
+    //construtor por omissão
     public LogVoluntario(){
         super();
-        this.username = new String();
-        this.password = new String();
-        this.disponibilidade = false;
+        this.username="";
+        this.password="";
+        this.disponibilidade=false;
+        this.classificacoes=new ArrayList<>();
     }
 
-    public LogVoluntario(String cod,String nome,Localizacao pos, double raio,String user, String pass, Boolean d){
-        super(cod,nome,pos,raio);
-        this.username = user;
+    //construtor parametrizado
+    public LogVoluntario(String cod, String nome, Localizacao gps, double raio, String user, String pass, boolean tf, ArrayList<Classificacao> cl){
+        super(cod,nome,gps,raio);
+        this.username=user;
         this.password=pass;
-        this.disponibilidade = d;
+        this.disponibilidade=tf;
+        setClassificacoes(cl);
     }
 
-    public LogVoluntario(LogVoluntario logV){
-        super(logV.getCodVoluntario(),logV.getNome(),logV.getPosicao(),logV.getRaio());
-        this.username = getUsername();
-        this.password=getPassword();
-        this.disponibilidade=getDisponibilidade();
+    public LogVoluntario(Voluntario v, String user, String pass, boolean tf,ArrayList<Classificacao> cl){
+        super(v.getCodVoluntario(),v.getNome(),v.getGps(),v.getRaio());
+        this.username=user;
+        this.password=pass;
+        this.disponibilidade=tf;
+        setClassificacoes(cl);
     }
 
-    public String getUsername(){
-        return username;
+    //construtor por cópia
+    public LogVoluntario(LogVoluntario log){
+        super(log.getCodVoluntario(),log.getNome(),log.getGps(),log.getRaio());
+        this.username=log.getUsername();
+        this.password=log.getPassword();
+        this.disponibilidade=log.getDisponibilidade();
+        setClassificacoes(log.getClassificacoes());
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-
-    public boolean getDisponibilidade(){
-        return disponibilidade;
-    }
-
-    public void setUsername(String user) {
-        this.username = user;
-    }
-
-    public void setPassword(String pass) {
-        this.password = pass;
-    }
-
-    public void setDisponibilidade(Boolean d) {
-        this.disponibilidade = d;
-    }
-
+    //metodo toString
     public String toString(){
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb= new StringBuilder();
         sb.append(super.toString());
-        sb.append("Username:").append(this.username).append("\n");
-        sb.append("Password").append(this.password).append("\n");
+        sb.append("Username").append(this.username).append("\n")
+                .append("Password:").append(this.password).append("\n")
+                .append("Classificações").append(this.classificacoes).append("\n");
         return sb.toString();
     }
 
-    public LogVoluntario clone(){
-        return new LogVoluntario(this);
-    }
+    //metodo clone
+    public LogVoluntario clone(){return new LogVoluntario(this);}
 
-
+    //metodo equals
     public boolean equals(Object o){
-        if(this ==o) return true;
-        if((o == null)|| (o.getClass() != this.getClass())) return false;
+        if(this==o) return true;
+        if( (o==null) || (o.getClass()!=this.getClass())) return false;
 
-        LogVoluntario owner = (LogVoluntario) o;
+        LogVoluntario vol =(LogVoluntario) o;
 
-        return (super.equals(owner)
-                && owner.getUsername().equals(this.getUsername())
-                && owner.getPassword().equals(this.getPassword()));
+        return (super.equals(vol))
+                && vol.getUsername().equals(this.username)
+                && vol.getPassword().equals(this.password)
+                && vol.getClassificacoes().equals(this.classificacoes);
     }
+
 }

@@ -1,63 +1,78 @@
-package trazAqui;
+package trazaqui;
 
-public class LogTransportadora extends Transportadora {
+import java.util.ArrayList;
+
+public class LogTransportadora extends Transportadora{
     private String username;
     private String password;
+    private ArrayList<Classificacao> classificacoes;
 
+    //getters
+    public String getUsername(){return username;}
+
+    public String getPassword(){return password;}
+
+    public ArrayList<Classificacao> getClassificacoes(){return new ArrayList<>(this.classificacoes);}
+
+    //setters
+    public void setUsername(String user){this.username=user;}
+
+    public void setPassword(String pass){this.password=pass;}
+
+    public void setClassificacoes(ArrayList<Classificacao> cl){this.classificacoes=new ArrayList<>(cl);}
+
+    //construtor vazio
     public LogTransportadora(){
         super();
-        this.username = new String();
-        this.password = new String();
+        this.username="";
+        this.password="";
+        this.classificacoes=new ArrayList<>();
     }
 
-    public LogTransportadora(String cod,String nome,double gpsx, double gpsy, String nif,double raio, double preco,String user, String pass){
-        super(cod,nome,gpsx,gpsy,nif,raio,preco);
-        this.username = user;
+    //construtores parametrizados
+    public LogTransportadora(String cod, String nome, Localizacao pos, String nif, double raio, double pk, String user, String pass, ArrayList<Classificacao> cl){
+        super(cod,nome,pos,nif,raio,pk);
+        this.username=user;
         this.password=pass;
+        setClassificacoes(cl);
     }
 
-    public LogTransportadora(LogTransportadora logT){
-        super(logT.getCodEmpresa(),logT.getNome(),logT.getCoordenadaX(), logT.getCoordenadaY(),logT.getNIF(),logT.getRaio(),logT.getPrecoporkm());
-        this.username = getUsername();
-        this.password=getPassword();
+    public LogTransportadora(Transportadora t, String user, String pass, ArrayList<Classificacao> cl){
+        super(t.getCodEmpresa(),t.getNome(),t.getGps(),t.getNif(),t.getRaio(),t.getPrecokm());
+        this.username=user;
+        this.password=pass;
+        setClassificacoes(cl);
     }
 
-    public String getUsername(){
-        return username;
+    //construtor por cópia
+    public LogTransportadora(LogTransportadora log){
+        super(log.getCodEmpresa(),log.getNome(),log.getGps(),log.getNif(),log.getRaio(),log.getPrecokm());
+        this.username=log.getNome();
+        this.password=log.getPassword();
+        setClassificacoes(log.getClassificacoes());
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setUsername(String user) {
-        this.username = user;
-    }
-
-    public void setPassword(String pass) {
-        this.password = pass;
-    }
-
+    //metodo toString
     public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append(super.toString());
-        sb.append("Username:").append(this.username).append("\n");
-        sb.append("Password").append(this.password).append("\n");
+        StringBuilder sb= new StringBuilder();
+        sb.append(super.toString())
+                .append("Username:").append(this.username).append("\n")
+                .append("Password:").append(this.password).append("\n")
+                .append("Classificações:").append(this.classificacoes).append("\n");
         return sb.toString();
     }
 
-    public LogTransportadora clone(){
-        return new LogTransportadora(this);
-    }
+    //metodo clone
+    public LogTransportadora clone(){return new LogTransportadora(this);}
 
+    //metodo equals
     public boolean equals(Object o){
-        if(this ==o) return true;
-        if((o == null)|| (o.getClass() != this.getClass())) return false;
-
-        LogTransportadora owner = (LogTransportadora) o;
-
-        return (super.equals(owner)
-                && owner.getUsername().equals(this.getUsername())
-                && owner.getPassword().equals(this.getPassword()));
+        if (this==o) return true;
+        if ((o==null) || (o.getClass()!=this.getClass())) return false;
+        LogTransportadora log = (LogTransportadora) o;
+        return (super.equals(log))
+                && log.getUsername().equals(this.getUsername())
+                && log.getPassword().equals(this.getPassword())
+                && log.getClassificacoes().equals(this.getClassificacoes());
     }
 }

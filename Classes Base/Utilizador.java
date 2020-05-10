@@ -1,94 +1,55 @@
-package trazAqui;
+package trazaqui;
 
 public class Utilizador {
     private String codUtilizador;
-    //private String username;
-    //private String password;
     private String nome;
-    private double gpsX;
-    private double gpsY;
+    private Localizacao gps;
 
-    //getters e setters
+    //getters
+    public String getCodUtilizador(){return codUtilizador;}
 
-   public String getCodUtilizador(){
-        return codUtilizador;
-    }
+    public String getNome(){return nome;}
 
-    public String getNome(){
-        return nome;
-    }
+    public Localizacao getGps(){return new Localizacao(this.gps.getX(),this.gps.getY());}
 
-   /* public String getPassword(){
-        return password;
-    }
-    */
+    //setters
+    public void setCodUtilizador(String c){this.codUtilizador=c;}
 
-    public double getCoordenadaX() {
-        return gpsX;
-    }
+    public void setNome(String n){this.nome=n;}
 
-    public double getCoordenadaY() {
-        return gpsY;
-    }
+    public void setGps(Localizacao pos){this.gps = new Localizacao(pos);}
 
-   public void setCodUtilizador(String user) {
-        this.codUtilizador=user;
-    }
+    //construtor por omissão
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-   /* public void setPassword(String password) {
-        this.password = password;
-    }
-
-    */
-
-    public void setCoordenadaX(double x) {
-        this.gpsX = x;
-    }
-
-    public void setCoordenadaY(double y) {
-        this.gpsY = y;
-    }
-
-
-    //Construtor por omissão
     public Utilizador(){
-        //this.username="";
-        //this.password="";
         this.codUtilizador="";
         this.nome="";
-        this.gpsX=0;
-        this.gpsY=0;
+        this.gps=new Localizacao();
     }
 
-    //Construtor parametrizado
-    public  Utilizador(String cod,String n,double x, double y){
-       // this.username=e;
-        //this.password=p;
+    //construtor parametrizado
+
+    public Utilizador(String cod, String nome, Localizacao pos){
         this.codUtilizador=cod;
-        this.nome=n;
-        this.gpsX=x;
-        this.gpsY=y;
+        this.nome=nome;
+        setGps(pos);
     }
 
-    //Construtor de copia
+    //construtor por cópia
+
     public Utilizador(Utilizador u){
-        //this.username=getUsername();
-        //this.password=getPassword();
         this.codUtilizador=getCodUtilizador();
         this.nome=getNome();
-        this.gpsX=getCoordenadaX();
-        this.gpsY=getCoordenadaY();
+        setGps(u.getGps());
     }
 
+    //metodo toString
     public String toString(){
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb= new StringBuilder();
         sb.append("Utilizador:\n").append("Nome:").append(this.nome).append("\n")
-                .append("\n").append("Codigo Utilizador:").append(this.codUtilizador)
-                .append("\n").append("Coordenadas:").append(this.gpsX).append(this.gpsY).append("\n");
+                .append("Código Utilizador:").append(this.codUtilizador).append("\n")
+                .append("Coordenadas:").append("(").append(this.gps).append("\n");
+
         return sb.toString();
     }
 }

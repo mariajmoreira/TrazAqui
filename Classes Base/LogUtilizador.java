@@ -1,52 +1,47 @@
-package trazAqui;
-
-import jdk.jshell.execution.Util;
+package trazaqui;
 
 public class LogUtilizador extends Utilizador {
     private String username;
     private String password;
 
+    //getters
+    public String getUsername(){return username;}
+
+    public String getPassword(){return password;}
+
+    //setters
+    public void setUsername(String user){this.username=user;}
+
+    public void setPassword(String pass){this.password=pass;}
+
+    //construtor por omissão
     public LogUtilizador(){
         super();
-        this.username = new String();
-        this.password = new String();
+        this.username="";
+        this.password="";
     }
 
-    public LogUtilizador(String cod,String nome,double gpsx, double gpsy, String user, String pass){
-        super(cod,nome,gpsx,gpsy);
-        this.username = user;
+    //construtor parametrizado
+    public LogUtilizador(String cod,String nome, Localizacao pos, String user, String pass){
+        super(cod,nome,pos);
+        this.username=user;
         this.password=pass;
     }
 
     public LogUtilizador(Utilizador u, String user, String pass){
-        super(u.getCodUtilizador(),u.getNome(),u.getCoordenadaX(),u.getCoordenadaY());
-        this.username = user;
+        super(u.getCodUtilizador(),u.getNome(),u.getGps());
+        this.username=user;
         this.password=pass;
     }
 
-    public LogUtilizador(LogUtilizador logU){
-        super(logU.getCodUtilizador(),logU.getNome(),logU.getCoordenadaX(), logU.getCoordenadaY());
-        this.username = getUsername();
-        this.password=getPassword();
+    //construtor por cópia
+    public LogUtilizador(LogUtilizador log){
+        super(log.getCodUtilizador(),log.getNome(),log.getGps());
+        this.username=log.getUsername();
+        this.password=log.getPassword();
     }
 
-    public String getUsername(){
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setUsername(String user) {
-        this.username = user;
-    }
-
-    public void setPassword(String pass) {
-        this.password = pass;
-    }
-
-
+    //metodo toString
     public String toString(){
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
@@ -55,19 +50,17 @@ public class LogUtilizador extends Utilizador {
         return sb.toString();
     }
 
-    public LogUtilizador clone(){
-        return new LogUtilizador(this);
-    }
+    //metodo clone
+    public LogUtilizador clone(){return new LogUtilizador(this);}
 
+    //metodo equals
     public boolean equals(Object o){
-        if(this ==o) return true;
-        if((o == null)|| (o.getClass() != this.getClass())) return false;
+        if (this==o) return true;
+        if ( (o==null) || (o.getClass() != this.getClass())) return false;
+        LogUtilizador user= (LogUtilizador) o;
 
-        LogUtilizador owner = (LogUtilizador) o;
-
-        return (super.equals(owner)
-                && owner.getUsername().equals(this.getUsername())
-                && owner.getPassword().equals(this.getPassword()));
+        return (super.equals(user))
+                && user.getUsername().equals(this.getUsername())
+                && user.getPassword().equals(this.getPassword());
     }
-
 }

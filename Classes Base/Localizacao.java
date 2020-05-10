@@ -1,4 +1,4 @@
-package trazAqui;
+package trazaqui;
 
 public class Localizacao {
     //variáveis de instância
@@ -109,3 +109,4 @@ public class Localizacao {
     }
 
 }
+

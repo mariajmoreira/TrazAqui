@@ -1,107 +1,54 @@
-package trazAqui;
+package trazaqui;
 
 public class Loja {
     private String codLoja;
-    //private String username;
-    //private String password;
     private String nome;
-    private double gpsX;
-    private double gpsY;
+    private Localizacao gps;
 
-    //getters e setters
-    public String getCodLoja(){
-        return codLoja;
-    }
+    //getters
+    public String getCodLoja(){return codLoja;}
 
-   /* public String getUsername(){
-        return username;
-    }
+    public String getNome(){return nome;}
 
-    */
+    public Localizacao getGps(){return new Localizacao(this.gps.getX(),this.gps.getY());}
 
-    public String getNome(){
-        return nome;
-    }
+    //setters
+    public void setCodLoja(String cod){this.codLoja=cod;}
 
-   /* public String getPassword(){
-        return password;
-    }
+    public void setNome(String nome){this.nome=nome;}
 
-    */
+    public void setGps(Localizacao pos){this.gps=new Localizacao(pos);}
 
-    public double getCoordenadaX() {
-        return gpsX;
-    }
-
-    public double getCoordenadaY() {
-        return gpsY;
-    }
-
-    /*public void setUsername(String user) {
-        this.username=user;
-    }
-
-     */
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-   /* public void setPassword(String password) {
-        this.password = password;
-    }
-
-    */
-
-    public void setCodLoja(String user) {
-        this.codLoja=user;
-    }
-
-
-    public void setCoordenadaX(double x) {
-        this.gpsX = x;
-    }
-
-    public void setCoordenadaY(double y) {
-        this.gpsY = y;
-    }
-
-
-    //Construtor por omissão
+    //construtor vazio
     public Loja(){
-       // this.username="";
-        //this.password="";
         this.codLoja="";
         this.nome="";
-        this.gpsX=0;
-        this.gpsY=0;
+        this.gps=new Localizacao();
     }
 
-    //Construtor parametrizado
-    public  Loja(String cod,String n,double x, double y){
-       // this.username=e;
-        //this.password=p;
+    //construtor parametrizado
+    public Loja(String cod, String nome, Localizacao gps){
         this.codLoja=cod;
-        this.nome=n;
-        this.gpsX=x;
-        this.gpsY=y;
+        this.nome=nome;
+        setGps(gps);
     }
 
-    //Construtor de copia
-    public Loja(Utilizador u){
-       // this.username=getUsername();
-        //this.password=getPassword();
-        this.codLoja=getCodLoja();
-        this.nome=getNome();
-        this.gpsX=getCoordenadaX();
-        this.gpsY=getCoordenadaY();
+    //construtor por cópia
+    public Loja(Loja l){
+        this.codLoja=l.getCodLoja();
+        this.nome=l.getNome();
+        setGps(l.getGps());
     }
 
+    //metodo toString
     public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append("Loja:\n").append("Nome:").append(this.nome).append("\n")
-                .append("\n").append("Codigo Loja:").append(this.codLoja)
-                .append("\n").append("Coordenadas:").append(this.gpsX).append(this.gpsY).append("\n");
+        StringBuilder sb= new StringBuilder();
+        sb.append("Loja:").append("\n")
+                .append("Código da Loja:").append(this.codLoja).append("\n")
+                .append("Nome:").append(this.nome).append("\n")
+                .append("Coordenadas gps:").append(this.gps).append("\n");
+
         return sb.toString();
     }
+
 }

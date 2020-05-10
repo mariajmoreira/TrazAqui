@@ -1,145 +1,78 @@
-package trazAqui;
+package trazaqui;
 
 public class Transportadora {
     private String codEmpresa;
-    //private String username;
-    //private String password;
     private String nome;
-    private double gpsX;
-    private double gpsY;
+    private Localizacao gps;
     private String nif;
     private double raio;
-    private double precoporkm;
-
-    //getters e setters
-
-    public String getCodEmpresa(){
-        return codEmpresa;
-    }
-
-   /* public String getUsername(){
-        return username;
-    }
-    */
-
-    public String getNome(){
-        return nome;
-    }
-
-  /*  public String getPassword(){
-        return password;
-    }
-
-   */
-
-    public double getCoordenadaX() {
-        return gpsX;
-    }
-
-    public double getCoordenadaY() {
-        return gpsY;
-    }
-
-    public String getNIF(){
-        return nif;
-    }
-
-    public double getRaio() {
-        return raio;
-    }
-
-    public double getPrecoporkm() {
-        return precoporkm;
-    }
-
-    public void setCodEmpresa(String cod) {
-        this.codEmpresa=cod;
-    }
-
-   /* public void setUsername(String user) {
-        this.username=user;
-    }
-
-    */
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-  /*  public void setPassword(String password) {
-        this.password = password;
-    }
-
-   */
-
-    public void setCoordenadaX(double x) {
-        this.gpsX = x;
-    }
-
-    public void setCoordenadaY(double y) {
-        this.gpsY = y;
-    }
-
-    public void setNIF(String n) {
-        this.nif = n;
-    }
-
-    public void setRaio(double r) {
-        this.raio = r;
-    }
-
-    public void setPrecoporkm(double p) {
-        this.precoporkm= p;
-    }
+    private double precokm;
 
 
-    //Construtor por omissão
+    //getters
+    public String getCodEmpresa(){return codEmpresa;}
+
+    public String getNome(){return nome;}
+
+    public Localizacao getGps(){return new Localizacao(this.gps.getX(),this.gps.getY());}
+
+    public String getNif(){return nif;}
+
+    public double getRaio(){return raio; }
+
+    public double getPrecokm(){return precokm;}
+
+    //setters
+    public void setCodEmpresa(String ce){this.codEmpresa=ce;}
+
+    public void setNome(String nome){this.nome=nome;}
+
+    public void setGps(Localizacao pos){this.gps=new Localizacao(pos);}
+
+    public void setNif(String nif){this.nif=nif;}
+
+    public void setRaio(double raio){this.raio=raio;}
+
+    public void setPrecokm(double pk){this.precokm=pk;}
+
+    //construtor vazio
     public Transportadora(){
-        this.codEmpresa ="";
-        //this.username="";
-        //this.password="";
+        this.codEmpresa="";
         this.nome="";
-        this.gpsX=0.0;
-        this.gpsY=0.0;
+        this.gps=new Localizacao();
         this.nif="";
-        this.raio=0.0;
-        this.precoporkm=0.0;
+        this.raio=0;
+        this.precokm=0;
     }
 
-    //Construtor parametrizado
-    public  Transportadora(String c,String n,double x, double y,String nif, double r, double preco){
-        //this.username=u;
-        //this.password=p;
-        this.codEmpresa =c;
-        this.nome=n;
-        this.gpsX=x;
-        this.gpsY=y;
+    //construtor parametrizado
+    public Transportadora(String cod, String nome, Localizacao pos, String nif, double raio, double pk){
+        this.codEmpresa=cod;
+        this.nome=nome;
+        setGps(pos);
         this.nif=nif;
-        this.raio=r;
-        this.precoporkm=preco;
+        this.raio=raio;
+        this.precokm=pk;
     }
 
-    //Construtor de copia
+    //construtor por cópia
     public Transportadora(Transportadora t){
-        //this.username=getUsername();
-        //this.password=getPassword();
-        this.nome=getNome();
-        this.gpsX=getCoordenadaX();
-        this.gpsY=getCoordenadaY();
-        this.nif=getNIF();
-        this.raio=getRaio();
-        this.precoporkm=getPrecoporkm();
-        this.codEmpresa =getCodEmpresa();
+        this.codEmpresa=t.getCodEmpresa();
+        this.nome=t.getNome();
+        setGps(t.getGps());
+        this.nif=t.getNif();
+        this.raio=t.getRaio();
+        this.precokm=t.getPrecokm();
     }
 
+    //metodo toString
     public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append("Transportadora:\n").append("Nome:").append(this.nome).append("\n")
-                .append("\n").append("Codigo Transportadora:").append(this.codEmpresa)
-                .append("\n").append("Coordenadas:").append(this.gpsX).append(this.gpsY)
-                .append("\n").append("Raio:").append(this.raio)
-                .append("\n").append("NIF:").append(this.nif)
-                .append("\n").append("Preço por km:").append(this.precoporkm);
+        StringBuilder sb=new StringBuilder();
+        sb.append("Trasnportador:\n").append("Codigo da Empresa:").append(this.codEmpresa)
+                .append("\n").append("Nome:").append(this.nome)
+                .append("\n").append("Gps:").append(this.gps)
+                .append("\n").append("Raio").append(this.raio)
+                .append("\n").append("Preço por Km:").append(this.precokm).append("\n");
         return sb.toString();
     }
 }
