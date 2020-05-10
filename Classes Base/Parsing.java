@@ -94,21 +94,22 @@ public class Parsing {
         String codLoja = campos[2];
         double peso = Double.parseDouble(campos[3]);
         ArrayList<LinhaEncomenda> l = new ArrayList<LinhaEncomenda>();
-        for(LinhaEncomenda s : l){
-            LinhaEncomenda linha = parseLinhaEncomenda(campos[4]);
+        for(int i=4; i<campos.length;i+=4){
+            LinhaEncomenda linha = parseLinhaEncomenda(campos[i],i);
             l.add(linha);
         }
         return new Encomenda(codEncomenda,codUtilizador,codLoja,peso,l);
     }
 
-    public LinhaEncomenda parseLinhaEncomenda(String input){
+    public LinhaEncomenda parseLinhaEncomenda(String input, int i){
         String[] campos = input.split(",");
-        String codProd = campos[0];
-        String descricao = campos[1];
-        double quantidade = Integer.parseInt(campos[2]);
-        double preco = Double.parseDouble(campos[3]);
+        String codProd = campos[i];
+        String descricao = campos[i+1];
+        double quantidade = Integer.parseInt(campos[i+2]);
+        double preco = Double.parseDouble(campos[i+3]);
         return new LinhaEncomenda(codProd,descricao,preco,quantidade);
     }
+
 
     public List<String> lerFicheiro(String nomeFich) {
         List<String> lines = new ArrayList<>();
@@ -117,7 +118,8 @@ public class Parsing {
         return lines;
     }
 
-    public void main(String[] args)  {
-        parse();
+    public static void main(String[] args)  {
+        Parsing p = new Parsing();
+        p.parse();
     }
 }
