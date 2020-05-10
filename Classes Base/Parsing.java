@@ -1,4 +1,4 @@
-package trazAqui;
+package trazaqui;
 
 import java.util.List;
 import java.util.*;
@@ -93,23 +93,29 @@ public class Parsing {
         String codUtilizador = campos[1];
         String codLoja = campos[2];
         double peso = Double.parseDouble(campos[3]);
-        ArrayList<LinhaEncomenda> l = new ArrayList<LinhaEncomenda>();
-        for(int i=4; i<campos.length;i+=4){
-            LinhaEncomenda linha = parseLinhaEncomenda(campos[i],i);
+        String[] tralhas= tralha(campos);
+        ArrayList<LinhaEncomenda> l= new ArrayList<>();
+        for(int i=0; i<tralhas.length;i+=4){
+            if (i+4>campos.length) break;
+            LinhaEncomenda linha = parseLinhaEncomenda(tralhas,i);
             l.add(linha);
         }
         return new Encomenda(codEncomenda,codUtilizador,codLoja,peso,l);
     }
 
-    public LinhaEncomenda parseLinhaEncomenda(String input, int i){
-        String[] campos = input.split(",");
+    public LinhaEncomenda parseLinhaEncomenda(String[] campos, int i){
         String codProd = campos[i];
         String descricao = campos[i+1];
-        double quantidade = Integer.parseInt(campos[i+2]);
+        double quantidade = Double.parseDouble(campos[i+2]);
         double preco = Double.parseDouble(campos[i+3]);
         return new LinhaEncomenda(codProd,descricao,preco,quantidade);
     }
 
+    public String[] tralha(String[] campos){
+        String[] tralha= new String[campos.length-4];
+        for (int i=4,j=0; i<campos.length;i++,j++) tralha[j]=campos[i];
+        return tralha;
+    }
 
     public List<String> lerFicheiro(String nomeFich) {
         List<String> lines = new ArrayList<>();
