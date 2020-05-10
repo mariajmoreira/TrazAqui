@@ -1,23 +1,33 @@
- 
+package trazAqui;
 
 import java.util.ArrayList;
 
-public class LinhaEncomenda extends Produto {
-    private int quantidade;
+public class LinhaEncomenda {
+    private String codProd;
+    private String descricao;
+    private double preco;
+    private double quantidade;
+
 
     public LinhaEncomenda() {
-        super();
-        this.quantidade = 0;
+        this.codProd = "n/a";
+        this.descricao = "n/a";
+        this.preco = 0.0;
+        this.quantidade=0;
     }
 
-    public LinhaEncomenda(String cod, String descricao, double preco, int quantidade) {
-        super(cod,descricao,preco)
-        this.quantidade = quantidade;
+    public LinhaEncomenda(String cod, String descricao, double preco, double qnt) {
+        this.codProd = cod;
+        this.descricao = descricao;
+        this.preco = preco;
+        this.quantidade=qnt;
     }
 
     public LinhaEncomenda(LinhaEncomenda linha) {
-        super(linha.getCodProd(),linha.getDescricao(),linha.getQuantidade());
-        this.quantidade = linha.getQuantidade();
+        this.codProd = linha.getCodProd();
+        this.descricao = linha.getDescricao();
+        this.preco = linha.getPreco();
+        this.quantidade=linha.getQuantidade();
     }
 
     public String getCodProd() {
@@ -44,12 +54,11 @@ public class LinhaEncomenda extends Produto {
         this.preco = preco;
     }
 
-    public int getQuantidade() {
+    public double getQuantidade() {
         return this.quantidade;
     }
 
-    public void setQuantidade(int quantidade) {
-        this.quantidade = quantidade;
+    public void setQuantidade(double qnt) { this.quantidade = qnt;
     }
 
     public LinhaEncomenda clone() {
@@ -69,7 +78,7 @@ public class LinhaEncomenda extends Produto {
         StringBuilder sb = new StringBuilder();
         sb.append("Encomendas:\n").append("Codigo Produto:").append(this.codProd).append("\n").append("Descriçao:")
                 .append(this.descricao).append("\n").append("Preco:").append(this.preco)
-                .append("\n").append("Quantidade:").append(this.quantidade).append("\n");
+                .append("\n");
         return sb.toString();
     }
 }

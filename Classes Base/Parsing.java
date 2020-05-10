@@ -1,4 +1,4 @@
- 
+package trazAqui;
 
 import java.util.List;
 import java.util.*;
@@ -49,9 +49,8 @@ public class Parsing {
         String nome = campos[1];
         double gpsx = Double.parseDouble(campos[2]);
         double gpsy = Double.parseDouble(campos[3]);
-        //String username = campos[4];
-        //String password = campos[5];
-        return new Utilizador(codUtilizador,nome,gpsx,gpsy);
+        Localizacao pos = new Localizacao(gpsx,gpsy);
+        return new Utilizador(codUtilizador,nome,pos);
     }
 
     public Loja parseLoja(String input){
@@ -60,9 +59,8 @@ public class Parsing {
         String nome = campos[1];
         double gpsx = Double.parseDouble(campos[2]);
         double gpsy = Double.parseDouble(campos[3]);
-        //String username = campos[4];
-        //String password = campos[5];
-        return new Loja(codLoja,nome,gpsx,gpsy);
+        Localizacao pos = new Localizacao(gpsx,gpsy);
+        return new Loja(codLoja,nome,pos);
     }
 
     public Transportadora parseTransportadora(String input){
@@ -71,25 +69,22 @@ public class Parsing {
         String nome = campos[1];
         double gpsx = Double.parseDouble(campos[2]);
         double gpsy = Double.parseDouble(campos[3]);
-        //String username = campos[4];
-        //String password = campos[5];
+        Localizacao pos = new Localizacao(gpsx,gpsy);
         double raio = Double.parseDouble(campos[5]);
         double precoporkm = Double.parseDouble(campos[6]);
         String nif = campos[4];
-        return new Transportadora(codEmpresa,nome,gpsx,gpsy,nif,raio,precoporkm);
+        return new Transportadora(codEmpresa,nome,pos,nif,raio,precoporkm);
     }
 
     public Voluntario parseVoluntario(String input){
         String[] campos = input.split(",");
         String codVoluntario = campos[0];
         String nome = campos[1];
-        //String username = campos[2];
-        //String password = campos[3];
-        double gpsx = Double.parseDouble(campos[4]);
-        double gpsy = Double.parseDouble(campos[5]);
-        double raio = Double.parseDouble(campos[6]);
-        //boolean disponibilidade = Boolean.parseBoolean(campos[7]);
-        return new Voluntario(codVoluntario,nome,gpsx,gpsy,raio);
+        double gpsx = Double.parseDouble(campos[2]);
+        double gpsy = Double.parseDouble(campos[3]);
+        Localizacao pos = new Localizacao(gpsx,gpsy);
+        double raio = Double.parseDouble(campos[4]);
+        return new Voluntario(codVoluntario,nome,pos,raio);
     }
 
     public Encomenda parseEncomenda(String input){
@@ -97,21 +92,21 @@ public class Parsing {
         String codEncomenda = campos[0];
         String codUtilizador = campos[1];
         String codLoja = campos[2];
-        double peso = Double.parseDouble(campos[3);
-        ArrayList<LinhaEncomenda> linhas = new ArrayList<>;
-        for(linhas){
+        double peso = Double.parseDouble(campos[3]);
+        ArrayList<LinhaEncomenda> l = new ArrayList<LinhaEncomenda>();
+        for(LinhaEncomenda s : l){
             LinhaEncomenda linha = parseLinhaEncomenda(campos[4]);
-            linhas.add(linha);
+            l.add(linha);
         }
-        return new Encomenda(codEncomenda,codUtilizador,codLoja,peso,linhas);
+        return new Encomenda(codEncomenda,codUtilizador,codLoja,peso,l);
     }
 
     public LinhaEncomenda parseLinhaEncomenda(String input){
         String[] campos = input.split(",");
         String codProd = campos[0];
         String descricao = campos[1];
-        int quantidade = Integer.parseInt(campos[2]);
-        double preco = Double.parseDouble(campos[3);
+        double quantidade = Integer.parseInt(campos[2]);
+        double preco = Double.parseDouble(campos[3]);
         return new LinhaEncomenda(codProd,descricao,preco,quantidade);
     }
 
@@ -120,5 +115,9 @@ public class Parsing {
         try{lines = Files.readAllLines(Paths.get("LogsTeste.csv"), StandardCharsets.UTF_8);}
         catch(IOException exc) { System.out.println(exc.getMessage()); }
         return lines;
+    }
+
+    public void main(String[] args)  {
+        parse();
     }
 }
