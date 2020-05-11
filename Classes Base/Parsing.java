@@ -132,5 +132,9 @@ public class Parsing {
         return lines;
     }
 
+    public static void main(String[] args) throws UtilizadorExisteException, VoluntarioExisteException, LojaExisteException, TransportadoraExisteException, CodigoJaEstaEmUsoException {
+        Parsing p = new Parsing();
+        p.parse();
+    }
 
 }
