@@ -1,4 +1,6 @@
-package trazaqui;
+package trazAqui;
+
+import trazAqui.Exceptions.*;
 
 import java.util.List;
 import java.util.*;
@@ -8,7 +10,9 @@ import java.io.*;
 
 public class Parsing {
 
-    public void parse(){
+    private Armazena a_armazena;
+
+    public void parse() throws CodigoJaEstaEmUsoException, TransportadoraExisteException, UtilizadorExisteException, LojaExisteException, VoluntarioExisteException {
         List<String> linhas = lerFicheiro("LogsTeste.csv"); //alterar nome do ficheiro
         String[] linhaPartida;
         for (String linha : linhas) {
@@ -16,18 +20,22 @@ public class Parsing {
             switch(linhaPartida[0]){
                 case "Utilizador":
                     Utilizador u = parseUtilizador(linhaPartida[1]); // criar um Utilizador
+                    a_armazena.novoUtilizador(u);
                     System.out.println(u.toString()); //enviar para o ecrÃ¡n apenas para teste
                     break;
                 case "Loja":
                     Loja l = parseLoja(linhaPartida[1]);
+                    a_armazena.novaLoja(l);
                     System.out.println(l.toString());
                     break;
                 case "Transportadora":
                     Transportadora t = parseTransportadora(linhaPartida[1]); // criar um Utilizador
+                    a_armazena.novaTransportadora(t);
                     System.out.println(t.toString()); //enviar para o ecrÃ¡n apenas para teste
                     break;
                 case "Voluntario":
                     Voluntario v = parseVoluntario(linhaPartida[1]); // criar um Utilizador
+                    a_armazena.novoVoluntario(v);
                     System.out.println(v.toString()); //enviar para o ecrÃ¡n apenas para teste
                     break;
                 case "Encomenda":
@@ -124,8 +132,5 @@ public class Parsing {
         return lines;
     }
 
-    public static void main(String[] args)  {
-        Parsing p = new Parsing();
-        p.parse();
-    }
+
 }
