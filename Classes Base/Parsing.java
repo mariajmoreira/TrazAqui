@@ -10,7 +10,7 @@ import java.io.*;
 
 public class Parsing {
 
-    private Armazena a_armazena;
+    private static Armazena a_armazena;
 
     public void parse() throws CodigoJaEstaEmUsoException, TransportadoraExisteException, UtilizadorExisteException, LojaExisteException, VoluntarioExisteException {
         List<String> linhas = lerFicheiro("LogsTeste.csv"); //alterar nome do ficheiro
@@ -135,6 +135,7 @@ public class Parsing {
     public static void main(String[] args) throws UtilizadorExisteException, VoluntarioExisteException, LojaExisteException, TransportadoraExisteException, CodigoJaEstaEmUsoException {
         Parsing p = new Parsing();
         p.parse();
+        System.out.println(a_armazena.getUtilizadores());
     }
 
 }
