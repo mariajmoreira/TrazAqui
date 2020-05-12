@@ -106,8 +106,29 @@ public class BaseDados implements Serializable {
     public void addLoja(LogLoja loj){
         this.lojas.put(loj.getUsername(),loj.clone());
     }
-    
 
+    //método que adiciona um novo produto a um determinada loja
+    public void addProduto(String user, Produto novo) throws LojaNaoExisteException{
+        if (!ExisteLoja(user))
+            throw new LojaNaoExisteException("A Loja não existe");
+        LogLoja l=this.lojas.get(user);
+        ArrayList<Produto> p=l.getProdutos();
+        p.add(novo);
+        l.setProdutos(p);
+    }
+
+    //método que atualiza o stock de um deteminado produto de uma loja
+    public void updateStock(String user, Produto update) throws LojaNaoExisteException{
+        if (!ExisteLoja(user))
+            throw new LojaNaoExisteException("A Loja não existe!");
+        LogLoja l=this.lojas.get(user);
+        ArrayList<Produto> p=l.getProdutos();
+        for(Produto pr: p){
+            if(pr.getCodProd().equals(update.getCodProd())){
+                pr.setStock(update.getStock());
+            }
+        }
+    }
     //metodo que verifica se um determinado user existe
     //utilizadores
     public boolean ExisteUtilizador(String user){
