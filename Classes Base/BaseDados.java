@@ -106,28 +106,27 @@ public class BaseDados implements Serializable {
     public void addLoja(LogLoja loj){
         this.lojas.put(loj.getUsername(),loj.clone());
     }
-
-
+    
 
     //metodo que verifica se um determinado user existe
     //utilizadores
-    public boolean ExisteUtilizador(String cod){
-        return utilizadores.containsKey(cod);
+    public boolean ExisteUtilizador(String user){
+        return utilizadores.containsKey(user);
     }
 
     //transportadoras
-    public boolean ExisteTransportadora(String cod){
-        return transportadoras.containsKey(cod);
+    public boolean ExisteTransportadora(String user){
+        return transportadoras.containsKey(user);
     }
 
     //voluntarios
-    public boolean ExisteVoluntario(String cod){
-        return voluntarios.containsKey(cod);
+    public boolean ExisteVoluntario(String user){
+        return voluntarios.containsKey(user);
     }
 
     //lojas
-    public boolean ExisteLoja(String cod){
-        return lojas.containsKey(cod);
+    public boolean ExisteLoja(String user){
+        return lojas.containsKey(user);
     }
 
     //metodo que verifica se um determinado produto existe
@@ -216,7 +215,7 @@ public class BaseDados implements Serializable {
         u.setUsername(user);
         u.setPassword(pass);
 
-        this.utilizadores.put(u.getCodUtilizador(), u.clone());
+        this.utilizadores.put(u.getUsername(), u.clone());
     }
 
     //transportadoras
@@ -236,7 +235,7 @@ public class BaseDados implements Serializable {
         t.setPassword(password);
         t.setClassificacoes(new ArrayList<>());
 
-        this.transportadoras.put(t.getCodEmpresa(),t.clone());
+        this.transportadoras.put(t.getUsername(),t.clone());
     }
 
     //voluntarios
@@ -255,7 +254,7 @@ public class BaseDados implements Serializable {
         v.setDisponibilidade(tf);
         v.setClassificacoes(new ArrayList<>());
 
-        this.voluntarios.put(v.getCodVoluntario(),v.clone());
+        this.voluntarios.put(v.getUsername(),v.clone());
     }
 
     //lojas
@@ -271,7 +270,7 @@ public class BaseDados implements Serializable {
         l.setUsername(user);
         l.setPassword(pass);
 
-        this.lojas.put(l.getCodLoja(),l.clone());
+        this.lojas.put(l.getUsername(),l.clone());
     }
 
     //método que cria um novo código para
