@@ -415,5 +415,72 @@ public class BaseDados implements Serializable {
     }
 
     //método que remove um produto de uma determinada loja
-    public void removeProduto(String user, Produto)
+    public void removeProduto(String user, Produto x) throws LojaNaoExisteException, ProdutoNaoExisteException{
+        if(!ExisteLoja(user))
+            throw new LojaNaoExisteException("Loja não existe!");
+        if(!produtoExiste(user,x.getCodProd()))
+            throw  new ProdutoNaoExisteException("Produto não existe!");
+        LogLoja log=this.lojas.get(user);
+        List<Produto> p=log.getProdutos();
+        p.removeIf(pr -> pr.equals(x));
+    }
+
+    //método que reduz o stock de um produto de uma loja
+    public void reduzStock(String user, String codprod, int stock) throws LojaNaoExisteException, ProdutoNaoExisteException{
+        if(!ExisteLoja(user))
+            throw new LojaNaoExisteException("Loja não existe!");
+        if(!produtoExiste(user, codprod))
+            throw new ProdutoNaoExisteException("Produto não existe!");
+
+        LogLoja log=this.lojas.get(user);
+        List<Produto> pr=log.getProdutos();
+        for(Produto p: pr){
+            if(p.getCodProd().equals(codprod)){
+                p.setStock(p.getStock()-stock);
+            }
+        }
+    }
+
+    //método que adicona uma classificação
+    //a uma transportadora
+    public void classifTrans(String user, Classificacao classif) throws TransportadoraNaoExisteException{
+        if(!ExisteTransportadora(user))
+            throw new TransportadoraNaoExisteException("A empresa transportadora não existe!");
+        List<Classificacao> cl= this.transportadoras.get(user).getClassificacoes();
+        cl.add(classif);
+    }
+
+    //a um voluntario
+    public void classifVol(String user, Classificacao classif) throws VoluntarioNaoExisteException{
+        if(!ExisteVoluntario(user))
+            throw new VoluntarioNaoExisteException("O voluntário não existe!");
+        List<Classificacao> cl= this.voluntarios.get(user).getClassificacoes();
+        cl.add(classif);
+    }
+
+    //método que determina a classificacao média
+    //das transportadoras
+    public double classifMediaTrans(String user) throws TransportadoraNaoExisteException{
+        if(!ExisteTransportadora(user))
+            throw new TransportadoraNaoExisteException("A empresa transportadora não existe!");
+        List<Classificacao> cl =this.transportadoras.get(user).getClassificacoes();
+        double count=0;
+        for(Classificacao c: cl){
+            count+=c.getClassificacao();
+        }
+
+        return count/cl.size();
+    }
+
+    //dos voluntarios
+    public double classifMediaVol(String user) throws VoluntarioNaoExisteException{
+        if(!ExisteVoluntario(user))
+            throw new VoluntarioNaoExisteException("O voluntario não existe!");
+        List<Classificacao> cl=this.voluntarios.get(user).getClassificacoes();
+        double count=0;
+        for(Classificacao c: cl){
+            count+=c.getClassificacao();
+        }
+        return count/cl.size();
+    }
 }
