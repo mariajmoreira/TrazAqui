@@ -1,6 +1,6 @@
-package trazAqui;
+package trazaqui;
 
-import trazAqui.Exceptions.*;
+import trazaqui.Exceptions.*;
 
 import java.util.List;
 import java.util.*;
@@ -11,6 +11,10 @@ import java.io.*;
 public class Parsing {
 
     private static Armazena a_armazena;
+
+    public Parsing(Armazena armazena){
+        a_armazena = armazena;
+    }
 
     public void parse() throws CodigoJaEstaEmUsoException, TransportadoraExisteException, UtilizadorExisteException, LojaExisteException, VoluntarioExisteException {
         List<String> linhas = lerFicheiro("LogsTeste.csv"); //alterar nome do ficheiro
@@ -133,9 +137,12 @@ public class Parsing {
     }
 
     public static void main(String[] args) throws UtilizadorExisteException, VoluntarioExisteException, LojaExisteException, TransportadoraExisteException, CodigoJaEstaEmUsoException {
-        Parsing p = new Parsing();
+        Armazena a = new Armazena();
+        Parsing p = new Parsing(a);
         p.parse();
-        System.out.println(a_armazena.getUtilizadores());
+        String cod="u40";
+        System.out.println(a.getUtilizadores());
+
     }
 
 }
