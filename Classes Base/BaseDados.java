@@ -107,28 +107,7 @@ public class BaseDados implements Serializable {
         this.lojas.put(loj.getUsername(),loj.clone());
     }
 
-    //método que adiciona um novo produto a um determinada loja
-    public void addProduto(String user, Produto novo) throws LojaNaoExisteException{
-        if (!ExisteLoja(user))
-            throw new LojaNaoExisteException("A Loja não existe");
-        LogLoja l=this.lojas.get(user);
-        ArrayList<Produto> p=l.getProdutos();
-        p.add(novo);
-        l.setProdutos(p);
-    }
 
-    //método que atualiza o stock de um deteminado produto de uma loja
-    public void updateStock(String user, Produto update) throws LojaNaoExisteException{
-        if (!ExisteLoja(user))
-            throw new LojaNaoExisteException("A Loja não existe!");
-        LogLoja l=this.lojas.get(user);
-        ArrayList<Produto> p=l.getProdutos();
-        for(Produto pr: p){
-            if(pr.getCodProd().equals(update.getCodProd())){
-                pr.setStock(update.getStock());
-            }
-        }
-    }
     //metodo que verifica se um determinado user existe
     //utilizadores
     public boolean ExisteUtilizador(String user){
@@ -148,16 +127,6 @@ public class BaseDados implements Serializable {
     //lojas
     public boolean ExisteLoja(String user){
         return lojas.containsKey(user);
-    }
-
-    //metodo que verifica se um determinado produto existe
-    public boolean produtoExiste(String codProd){
-        for(LogLoja x : this.lojas.values()){
-            for(Produto p : x.getProdutos()){
-                if(p.getCodProd().equals(codProd)) return true;
-            }
-        }
-        return false;
     }
 
     //metodo que verifica a correspondência do username e da password introduzidos
@@ -362,7 +331,7 @@ public class BaseDados implements Serializable {
 
     //mudar a localização
     //de um utilizador
-    public void MudardeCasa(String cod, double x, double y){
+    public void setLocalizacaoUtilizador(String cod, double x, double y){
         Localizacao loc=new Localizacao(x,y);
         for(LogUtilizador lu : this.utilizadores.values()){
             if(lu.getCodUtilizador().equals(cod)){
@@ -401,6 +370,47 @@ public class BaseDados implements Serializable {
         }
     }
 
+    //metodo que verifica em que lojas é que um determinado produto existe
+    public Set<String> produtoExisteGlobal(String descricao) throws ProdutoNaoExisteException{
+        Set<String> nomes=new TreeSet<>();
+        for(LogLoja x : this.lojas.values()){
+            for(Produto p : x.getProdutos()){
+                if(p.getDescricao().equals(descricao)){
+                    nomes.add(x.getNome());
+                }
+            }
+        }
+        if (nomes.isEmpty()) throw new ProdutoNaoExisteException("O produto não existe!");
 
+        return nomes;
+    }
 
+    //metodo que verifica se um deteminado produto existe
+    public boolean produtoExiste(String user, String CodProd){
+        LogLoja log=this.lojas.get(user);
+        List<Produto> p=log.getProdutos();
+        for (Produto pr: p){
+            if (pr.getCodProd().equals(CodProd))
+                return true;
+        }
+        return false;
+    }
+
+    //método que adiciona um novo produto ou atualiza o stock de uma determinada loja
+    public void addProduto(String user, Produto novo) throws LojaNaoExisteException {
+        if (!ExisteLoja(user))
+            throw new LojaNaoExisteException("A Loja não existe");
+        LogLoja l = this.lojas.get(user);
+        ArrayList<Produto> p = l.getProdutos();
+        if (produtoExiste(user, novo.getCodProd())) {
+            for (Produto pr : p) {
+                if (pr.getCodProd().equals(novo.getCodProd())) {
+                    pr.setStock(novo.getStock());
+                }
+            }
+        } else {
+            p.add(novo);
+            l.setProdutos(p);
+        }
+    }
 }
