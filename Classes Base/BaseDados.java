@@ -405,7 +405,7 @@ public class BaseDados implements Serializable {
         if (produtoExiste(user, novo.getCodProd())) {
             for (Produto pr : p) {
                 if (pr.getCodProd().equals(novo.getCodProd())) {
-                    pr.setStock(novo.getStock());
+                    pr.setStock(pr.getStock()+novo.getStock());
                 }
             }
         } else {
@@ -413,4 +413,7 @@ public class BaseDados implements Serializable {
             l.setProdutos(p);
         }
     }
+
+    //método que remove um produto de uma determinada loja
+    public void removeProduto(String user, Produto)
 }
