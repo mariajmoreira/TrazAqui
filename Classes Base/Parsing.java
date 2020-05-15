@@ -1,6 +1,6 @@
-package trazaqui;
+package trazAqui;
 
-import trazaqui.Exceptions.*;
+import trazAqui.Exceptions.*;
 
 import java.util.List;
 import java.util.*;
@@ -11,12 +11,9 @@ import java.io.*;
 public class Parsing {
 
     private static Armazena a_armazena;
+    private static BaseDados b_dados;
 
-    public Parsing(Armazena armazena){
-        a_armazena = armazena;
-    }
-
-    public void parse() throws CodigoJaEstaEmUsoException, TransportadoraExisteException, UtilizadorExisteException, LojaExisteException, VoluntarioExisteException {
+    public void parse(Armazena a_armazena) throws CodigoJaEstaEmUsoException, TransportadoraExisteException, UtilizadorExisteException, LojaExisteException, VoluntarioExisteException, EncomendaExisteException {
         List<String> linhas = lerFicheiro("LogsTeste.csv"); //alterar nome do ficheiro
         String[] linhaPartida;
         for (String linha : linhas) {
@@ -43,14 +40,16 @@ public class Parsing {
                     System.out.println(v.toString()); //enviar para o ecrÃ¡n apenas para teste
                     break;
                 case "Encomenda":
-                    Encomenda e = parseEncomenda(linhaPartida[1]); // criar um Utilizador
+                    Encomenda e = parseEncomenda(linhaPartida[1]);// criar um Utilizador
+                    CatalogoProdutos c = parseCatalogo(linhaPartida[1]);
+                    a_armazena.novaEncomenda(e);
+                    a_armazena.novoCatalogoProdutos(c);
                     System.out.println(e.toString()); //enviar para o ecrÃ¡n apenas para teste
                     break;
                 default:
                     System.out.println("Linha invÃ¡lida.");
                     break;
             }
-
         }
         System.out.println("done!");
     }
@@ -115,6 +114,19 @@ public class Parsing {
         return new Encomenda(codEncomenda,codUtilizador,codLoja,peso,l);
     }
 
+    public CatalogoProdutos parseCatalogo(String input){
+        String[] campos = input.split(",");
+        String codLoja = campos[2];
+        String[] tralhas= tralha(campos);
+        ArrayList<Produto> l= new ArrayList<>();
+        for(int i=0; i<tralhas.length;i+=4){
+            if (i+4>campos.length) break;
+            Produto p = parseProduto(tralhas,i);
+            l.add(p);
+        }
+        return new CatalogoProdutos(codLoja,l);
+    }
+
     public LinhaEncomenda parseLinhaEncomenda(String[] campos, int i){
         String codProd = campos[i];
         String descricao = campos[i+1];
@@ -122,6 +134,15 @@ public class Parsing {
         double preco = Double.parseDouble(campos[i+3]);
         return new LinhaEncomenda(codProd,descricao,preco,quantidade);
     }
+
+    public Produto parseProduto(String[] campos, int i){
+        String codProd = campos[i];
+        String descricao = campos[i+1];
+        double quantidade = Double.parseDouble(campos[i+2]);
+        double preco = Double.parseDouble(campos[i+3]);
+        return new Produto(codProd,descricao,preco,quantidade);
+    }
+
 
     public String[] tralha(String[] campos){
         String[] tralha= new String[campos.length-4];
@@ -136,6 +157,10 @@ public class Parsing {
         return lines;
     }
 
+    public Parsing(Armazena armazena) throws UtilizadorExisteException, VoluntarioExisteException, LojaExisteException, TransportadoraExisteException, CodigoJaEstaEmUsoException, EncomendaExisteException {
+        parse(armazena);
+    }
+/*
     public static void main(String[] args) throws UtilizadorExisteException, VoluntarioExisteException, LojaExisteException, TransportadoraExisteException, CodigoJaEstaEmUsoException {
         Armazena a = new Armazena();
         Parsing p = new Parsing(a);
@@ -144,5 +169,5 @@ public class Parsing {
         System.out.println(a.getUtilizadores());
 
     }
-
+*/
 }

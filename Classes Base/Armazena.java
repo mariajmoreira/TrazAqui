@@ -3,15 +3,18 @@ package trazAqui;
 import trazAqui.Exceptions.*;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.*;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Armazena implements Serializable {
     private Map<String,Utilizador> utilizadores;
     private Map <String,Loja> lojas;
     private Map <String,Transportadora> transportadoras;
     private Map <String,Voluntario> voluntarios;
-
+    private Map <String,Encomenda> encomendas;
+    private ArrayList<CatalogoProdutos> produtos;
 
     /**
      * Construtor vazio
@@ -21,16 +24,18 @@ public class Armazena implements Serializable {
         this.lojas = new HashMap<>();
         this.transportadoras = new HashMap<>();
         this.voluntarios = new HashMap<>();
+        this.encomendas = new HashMap<>();
     }
 
     /**
      * Metodo construtor parameterizado
      */
-    public Armazena( Map<String,Utilizador> u, Map<String,Loja> l, Map<String,Transportadora> t, Map<String,Voluntario> v){
+    public Armazena( Map<String,Utilizador> u, Map<String,Loja> l, Map<String,Transportadora> t, Map<String,Voluntario> v,Map<String,Encomenda> e){
         setUtilizadores(u);
         setLojas(l);
         setTransportadoras(t);
         setVoluntarios(v);
+        setEncomendas(e);
     }
 
     /**
@@ -42,6 +47,7 @@ public class Armazena implements Serializable {
         setLojas(list.getLojas());
         setTransportadoras(list.getTransportadoras());
         setVoluntarios(list.getVoluntarios());
+        setEncomendas(list.getEncomendas());
     }
 
     /**
@@ -52,6 +58,34 @@ public class Armazena implements Serializable {
     public Utilizador getUtilizador(String cod){
         for(Utilizador c : this.utilizadores.values()){
             if(c.getCodUtilizador().equals(cod))
+                return c;        }
+        return null;
+    }
+
+    public Loja getLoja(String cod){
+        for(Loja c : this.lojas.values()){
+            if(c.getCodLoja().equals(cod))
+                return c;        }
+        return null;
+    }
+
+    public Transportadora getTransportadora(String cod){
+        for(Transportadora c : this.transportadoras.values()){
+            if(c.getCodEmpresa().equals(cod))
+                return c;        }
+        return null;
+    }
+
+    public Voluntario getVoluntario(String cod){
+        for(Voluntario c : this.voluntarios.values()){
+            if(c.getCodVoluntario().equals(cod))
+                return c;        }
+        return null;
+    }
+
+    public Encomenda getEncomenda(String cod){
+        for(Encomenda c : this.encomendas.values()){
+            if(c.getcodEncomenda().equals(cod))
                 return c;        }
         return null;
     }
@@ -100,6 +134,14 @@ public class Armazena implements Serializable {
         Map<String,Voluntario> ret = new HashMap<>();
         for(Voluntario p : this.voluntarios.values()){
             ret.put(p.getCodVoluntario(),p.clone());
+        }
+        return ret;
+    }
+
+    public Map<String,Encomenda> getEncomendas(){
+        Map<String,Encomenda> ret = new HashMap<>();
+        for(Encomenda p : this.encomendas.values()){
+            ret.put(p.getcodEncomenda(),p.clone());
         }
         return ret;
     }
@@ -184,6 +226,12 @@ public class Armazena implements Serializable {
         }
     }
 
+    public void setEncomendas(Map<String,Encomenda> e){
+        this.encomendas = new HashMap<>();
+        for(Encomenda  p : e.values()){
+            this.encomendas.put(p.getcodEncomenda(),p.clone());
+        }
+    }
 
     /**
      * Clonar um objecto da classe BaseDados
@@ -254,7 +302,7 @@ public class Armazena implements Serializable {
     public void novaTransportadora(Transportadora t) throws TransportadoraExisteException, CodigoJaEstaEmUsoException{
         if(this.codEmUso(t.getCodEmpresa()))
         throw new CodigoJaEstaEmUsoException("Ja existe um registo com este codigo");
-        LogTransportadora p = new LogTransportadora();
+        Transportadora p = new Transportadora();
         p.setCodEmpresa(t.getCodEmpresa());
         p.setNome(t.getNome());
         p.setGps(t.getGps());
@@ -267,12 +315,30 @@ public class Armazena implements Serializable {
     public void novoVoluntario(Voluntario v) throws VoluntarioExisteException, CodigoJaEstaEmUsoException{
         if(this.codEmUso(v.getCodVoluntario()))
         throw new CodigoJaEstaEmUsoException("Ja existe um registo com este codigo");
-        LogVoluntario p = new LogVoluntario();
+        Voluntario p = new Voluntario();
         p.setCodVoluntario(v.getCodVoluntario());
         p.setNome(v.getNome());
         p.setGps(v.getGps());
 
         this.voluntarios.put(p.getCodVoluntario(),p.clone());
+    }
+
+    public void novaEncomenda(Encomenda e) throws EncomendaExisteException, CodigoJaEstaEmUsoException{
+        if(this.codEmUso(e.getcodEncomenda()))
+            throw new CodigoJaEstaEmUsoException("Ja existe um registo com este codigo");
+        Encomenda p = new Encomenda();
+        p.setCodEncomenda(e.getcodEncomenda());
+        p.setCodUtilizador(e.getcodUtilizador());
+        p.setCodLoja(e.getcodLoja());
+        p.setPeso(e.getPeso());
+        p.setLinhas(e.getLinhas());
+        this.encomendas.put(p.getcodEncomenda(),p.clone());
+    }
+
+    public void novoCatalogoProdutos(CatalogoProdutos l){
+        CatalogoProdutos p = new CatalogoProdutos();
+        p.setProdutos(l.getProdutos());
+        this.produtos.add(p.clone());
     }
 
     public boolean codEmUso(String cod){
@@ -289,6 +355,49 @@ public class Armazena implements Serializable {
             if(v.getCodVoluntario().equals(cod))
                 return true;
         return false;
+    }
+
+    public String toStringUtilizadores(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Utilizadores:").append(this.utilizadores);
+        return sb.toString();
+    }
+
+    public String toStringLojas(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Lojas:").append(this.lojas);
+        return sb.toString();
+    }
+
+    public String toStringTransportadoras(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(":").append(this.lojas);
+        return sb.toString();
+    }
+
+    public Set<String> lojasOrdemAlfabetica(){
+        Set<String> s = new TreeSet<>();
+        for(Loja a : this.getLojas().values()){
+            s.add(a.getNome());
+        }
+        return s;
+    }
+
+    public Produto converte(LinhaEncomenda l){
+        Produto p = new Produto();
+        p.setCodProd(l.getCodProd());
+        p.setDescricao(l.getDescricao());
+        p.setPreco(l.getPreco());
+        p.setStock(l.getQuantidade());
+        return p;
+    }
+
+    public List<Produto> defaultProdutos(Encomenda e){
+        ArrayList<Produto> produtos= new ArrayList<>();
+        for(LinhaEncomenda l : e.getLinhas() ){
+           produtos.add(converte(l));
+        }
+        return produtos;
     }
 
 }
