@@ -13,14 +13,14 @@ public class LogLoja extends Loja{
 
     public String getPassword(){return password;}
 
-    public CatalogoProdutos getCp(){return new CatalogoProdutos(cp);}
+    public CatalogoProdutos getCatalogoProdutos(){return this.cp;}
 
     //setters
     public void setUsername(String user){this.username=user;}
 
     public void setPassword(String pass){this.password=pass;}
 
-    public void setCP(CatalogoProdutos catalogo){this.cp=new CatalogoProdutos(catalogo);}
+    public void setCatalogoProdutos(CatalogoProdutos catalogo){this.cp=catalogo;}
 
     //construtor vazio
     public LogLoja(){
@@ -35,14 +35,14 @@ public class LogLoja extends Loja{
         super(cod,nome,pos);
         this.username=user;
         this.password=pass;
-        setCP(catalogo);
+        setCatalogoProdutos(catalogo);
     }
 
     public LogLoja(Loja l, String user, String pass,CatalogoProdutos catalogo){
         super(l.getCodLoja(),l.getNome(),l.getGps());
         this.username=user;
         this.password=pass;
-        setCP(catalogo);
+        setCatalogoProdutos(catalogo);
     }
 
     //construtor por cópia
@@ -50,7 +50,7 @@ public class LogLoja extends Loja{
         super(l.getCodLoja(),l.getNome(),l.getGps());
         this.username=l.getUsername();
         this.password=l.getPassword();
-        setCP(l.getCp());
+        setCatalogoProdutos(l.getCatalogoProdutos());
     }
 
     //metodo String
@@ -77,7 +77,7 @@ public class LogLoja extends Loja{
         return super.equals(loj)
                 && loj.getUsername().equals(this.getUsername())
                 && loj.getPassword().equals(this.getPassword())
-                && loj.getCp().equals(this.getCp());
+                && loj.getCatalogoProdutos().equals(this.getCatalogoProdutos());
     }
 
 }
