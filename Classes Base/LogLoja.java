@@ -1,124 +1,83 @@
-package trazAqui;
+package trazaqui;
 
+import java.util.ArrayList;
 import java.util.List;
-import  java.util.ArrayList;
 
-public class LogLoja extends Loja {
+public class LogLoja extends Loja{
     private String username;
     private String password;
     private CatalogoProdutos cp;
 
+    //getters
+    public String getUsername(){return username;}
+
+    public String getPassword(){return password;}
+
+    public CatalogoProdutos getCp(){return new CatalogoProdutos(cp);}
+
+    //setters
+    public void setUsername(String user){this.username=user;}
+
+    public void setPassword(String pass){this.password=pass;}
+
+    public void setCP(CatalogoProdutos catalogo){this.cp=new CatalogoProdutos(catalogo);}
+
+    //construtor vazio
     public LogLoja(){
         super();
-        this.username = new String();
-        this.password = new String();
-        this.cp = new CatalogoProdutos();
+        this.username="";
+        this.password="";
+        this.cp=new CatalogoProdutos();
     }
 
-   /* public LogLoja(Loja l, List<Produto> p){
-        super(l.getCodLoja(),l.getNome(),l.getGps());
-        this.username = "";
-        this.password= "";
-        setProdutos(p);
-    }
-
-    */
-
-    public LogLoja(String cod,String nome,Localizacao pos, String user, String pass,CatalogoProdutos l){
+    //construtores parametrizados
+    public LogLoja(String cod,String nome, Localizacao pos, String user, String pass,CatalogoProdutos catalogo){
         super(cod,nome,pos);
-        this.username = user;
+        this.username=user;
         this.password=pass;
-        setCatalogoProdutos(l);
+        setCP(catalogo);
     }
 
-    public LogLoja(LogLoja logL){
-        super(logL.getCodLoja(),logL.getNome(),logL.getGps());
-        this.username = getUsername();
-        this.password=getPassword();
-        setCatalogoProdutos(logL.getCatalogoProdutos());
+    public LogLoja(Loja l, String user, String pass,CatalogoProdutos catalogo){
+        super(l.getCodLoja(),l.getNome(),l.getGps());
+        this.username=user;
+        this.password=pass;
+        setCP(catalogo);
     }
 
-    public CatalogoProdutos getCatalogoProdutos(){
-        return new CatalogoProdutos(cp);
+    //construtor por cópia
+    public LogLoja(LogLoja l){
+        super(l.getCodLoja(),l.getNome(),l.getGps());
+        this.username=l.getUsername();
+        this.password=l.getPassword();
+        setCP(l.getCp());
     }
 
-    public void setCatalogoProdutos(CatalogoProdutos c){
-        this.cp=new CatalogoProdutos(c);
-
-    }
-
-    public String getUsername(){
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setUsername(String user) {
-        this.username = user;
-    }
-
-    public void setPassword(String pass) {
-        this.password = pass;
-    }
-
-  /*
-    public void addProduto(Produto prod){
-        List<Produto> ret = this.getProdutos();
-        ret.add(prod.clone());
-        setProdutos(ret);
-
-    }
-
-   */
-
+    //metodo String
     public String toString(){
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb= new StringBuilder();
         sb.append(super.toString());
-        sb.append("Username:").append(this.username).append("\n");
-        sb.append("Password").append(this.password).append("\n");
+        sb.append("Username:").append(this.username).append("\n")
+                .append("Password:").append(this.password).append("\n")
+                .append("Produtos:").append(this.cp).append("\n");
+
         return sb.toString();
     }
 
+    //metodo clone
+    public LogLoja clone(){ return new LogLoja(this);}
 
-
-    public LogLoja clone(){
-        return new LogLoja(this);
-    }
-/*
-    public int removeProduto(String mat){
-        List<Produto> ret = this.getProdutos(); Produto x = new Produto(); int res = 0;
-        //Iterator it = ret.iterator();
-        /*while(it.hasNext()){
-            Veiculo v = (Veiculo) it.next();
-            if(v.getMatricula().equals(mat))
-                it.remove();
-
-        }
-        for(Produto k : ret){
-            if(k.getDescricao().equals(mat)){
-                x = k;
-                res = 1;
-            }
-        }
-        ret.remove(x);
-        setProdutos(ret);
-        return res;
-    }
-
- */
-
-
+    //metodo equals
     public boolean equals(Object o){
-        if(this ==o) return true;
-        if((o == null)|| (o.getClass() != this.getClass())) return false;
+        if (o==this) return true;
+        if ((o==null) || (o.getClass()!=this.getClass())) return false;
 
-        LogLoja owner = (LogLoja) o;
+        LogLoja loj= (LogLoja) o;
 
-        return (super.equals(owner)
-                && owner.getUsername().equals(this.getUsername())
-                && owner.getPassword().equals(this.getPassword()));
+        return super.equals(loj)
+                && loj.getUsername().equals(this.getUsername())
+                && loj.getPassword().equals(this.getPassword())
+                && loj.getCp().equals(this.getCp());
     }
 
 }
