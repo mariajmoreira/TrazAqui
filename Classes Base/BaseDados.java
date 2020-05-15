@@ -1,15 +1,29 @@
-package trazaqui;
+package trazAqui;
 
-import trazaqui.Exceptions.*;
-
+import trazAqui.Exceptions.*;
+import java.util.List;
+        import java.util.ArrayList;
+        import java.util.Map;
+        import java.util.HashMap;
+        import java.util.TreeSet;
+        import java.util.Set;
+        import java.time.LocalDate;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
-import java.util.*;
+        import java.util.Scanner;
+        import java.util.Comparator;
+        import java.io.File;
+import java.time.format.DateTimeFormatter;
+        import java.util.Iterator;
+        import java.util.Random;
 
 public class BaseDados implements Serializable {
     private Map <String,LogUtilizador> utilizadores;
     private Map <String,LogTransportadora> transportadoras;
     private Map <String,LogVoluntario> voluntarios;
     private Map <String,LogLoja> lojas;
+
+
 
     //getters
     public Map<String,LogUtilizador> getUtilizadores(){return new HashMap<>(this.utilizadores);}
@@ -31,6 +45,10 @@ public class BaseDados implements Serializable {
 
     //clone
     public BaseDados clone(){return new BaseDados(this);}
+
+    public BaseDados(Armazena armazena){
+
+    }
 
     //construtor vazio
     public BaseDados(){
@@ -108,25 +126,36 @@ public class BaseDados implements Serializable {
     }
 
 
+
     //metodo que verifica se um determinado user existe
     //utilizadores
-    public boolean ExisteUtilizador(String user){
-        return utilizadores.containsKey(user);
+    public boolean ExisteUtilizador(String username){
+        return utilizadores.containsKey(username);
     }
 
     //transportadoras
-    public boolean ExisteTransportadora(String user){
-        return transportadoras.containsKey(user);
+    public boolean ExisteTransportadora(String username){
+        return transportadoras.containsKey(username);
     }
 
     //voluntarios
-    public boolean ExisteVoluntario(String user){
-        return voluntarios.containsKey(user);
+    public boolean ExisteVoluntario(String username){
+        return voluntarios.containsKey(username);
     }
 
     //lojas
-    public boolean ExisteLoja(String user){
-        return lojas.containsKey(user);
+    public boolean ExisteLoja(String username){
+        return lojas.containsKey(username);
+    }
+
+    //metodo que verifica se um determinado produto existe
+    public boolean produtoExiste(String codProd){
+        for(LogLoja x : this.lojas.values()){
+            for(Produto p : x.getCatalogoProdutos().getProdutos()){
+                if(p.getCodProd().equals(codProd)) return true;
+            }
+        }
+        return false;
     }
 
     //metodo que verifica a correspondência do username e da password introduzidos
@@ -194,22 +223,22 @@ public class BaseDados implements Serializable {
 
     //regista um novo user na base de dados
     //utilizador
-    public void novoUtilizador(String nome, Localizacao pos, String user, String pass) throws UsernameJaEstaEmUsoException{
-        if(userEmUso(user))
+    public void novoUtilizador(String nome, Localizacao pos, String username, String pass) throws UtilizadorExisteException,UsernameJaEstaEmUsoException{
+        if(userEmUso(username))
             throw new UsernameJaEstaEmUsoException("Ja existe um registo com este username");
         String cod=novoCodUtilizador();
         LogUtilizador u=new LogUtilizador();
         u.setCodUtilizador(cod);
         u.setNome(nome);
         u.setGps(pos);
-        u.setUsername(user);
+        u.setUsername(username);
         u.setPassword(pass);
-
+        if(ExisteUtilizador(username)) throw new UtilizadorExisteException("Já existe um registo para esse username");
         this.utilizadores.put(u.getUsername(), u.clone());
     }
 
     //transportadoras
-    public void novaTransportadora(String nome, Localizacao gps, String nif, double raio, double precokm, String user, String password) throws UsernameJaEstaEmUsoException{
+    public void novaTransportadora(String nome, Localizacao gps, String nif, double raio, double precokm, String user, String password) throws TransportadoraExisteException,UsernameJaEstaEmUsoException{
         if(userEmUso(user))
             throw new UsernameJaEstaEmUsoException("Ja existe um registo com este username");
 
@@ -224,12 +253,12 @@ public class BaseDados implements Serializable {
         t.setUsername(user);
         t.setPassword(password);
         t.setClassificacoes(new ArrayList<>());
-
+        if(ExisteTransportadora(user)) throw new TransportadoraExisteException("Já existe um registo para esse username");
         this.transportadoras.put(t.getUsername(),t.clone());
     }
 
     //voluntarios
-    public void novoVoluntario(String nome, Localizacao gps, double raio, String user, String pass, boolean tf) throws UsernameJaEstaEmUsoException {
+    public void novoVoluntario(String nome, Localizacao gps, double raio, String user, String pass, boolean tf) throws VoluntarioExisteException,UsernameJaEstaEmUsoException {
         if(userEmUso(user))
             throw new UsernameJaEstaEmUsoException("Já existe um registo com este username");
 
@@ -243,12 +272,12 @@ public class BaseDados implements Serializable {
         v.setPassword(pass);
         v.setDisponibilidade(tf);
         v.setClassificacoes(new ArrayList<>());
-
+        if(ExisteVoluntario(user)) throw new VoluntarioExisteException("Já existe um registo para esse username");
         this.voluntarios.put(v.getUsername(),v.clone());
     }
 
     //lojas
-    public void novaLoja(String nome, Localizacao gps, String user, String pass) throws UsernameJaEstaEmUsoException{
+    public void novaLoja(String nome, Localizacao gps, String user, String pass) throws LojaExisteException,UsernameJaEstaEmUsoException{
         if (userEmUso(user))
             throw new UsernameJaEstaEmUsoException("Já existe um registo com este username");
 
@@ -259,8 +288,88 @@ public class BaseDados implements Serializable {
         l.setGps(gps);
         l.setUsername(user);
         l.setPassword(pass);
-
+        if(ExisteLoja(user)) throw new LojaExisteException("Já existe um registo para esse username");
         this.lojas.put(l.getUsername(),l.clone());
+    }
+
+    public void novaLoja(LogLoja l) throws LojaExisteException, CodigoJaEstaEmUsoException{
+        if(userEmUso(l.getUsername()))
+            throw new CodigoJaEstaEmUsoException("Ja existe um registo com este código");
+        LogLoja p = new LogLoja();
+        p.setCodLoja(l.getCodLoja());
+        p.setNome(l.getNome());
+        p.setGps(l.getGps());
+        p.setUsername(l.getUsername());
+        p.setPassword(l.getPassword());
+        p.setCatalogoProdutos(l.getCatalogoProdutos());
+        this.lojas.put(p.getCodLoja(),p.clone());
+    }
+    /**
+     * ASSOCIAR CONTA CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO
+     */
+
+    public void associaLoja(String cod, String nome, Localizacao gps, String user, String pass) throws LojaExisteException,UsernameJaEstaEmUsoException {
+        if (userEmUso(user))
+            throw new UsernameJaEstaEmUsoException("Já existe um registo com este username");
+
+        LogLoja l = new LogLoja();
+        l.setCodLoja(cod);
+        l.setNome(nome);
+        l.setGps(gps);
+        l.setUsername(user);
+        l.setPassword(pass);
+        if (ExisteLoja(user)) throw new LojaExisteException("Já existe um registo para esse username");
+        this.lojas.put(l.getUsername(), l.clone());
+    }
+
+    public void associaVoluntario(String cod,String nome, Localizacao gps, double raio, String user, String pass, boolean tf) throws VoluntarioExisteException,UsernameJaEstaEmUsoException {
+        if(userEmUso(user))
+            throw new UsernameJaEstaEmUsoException("Já existe um registo com este username");
+
+        LogVoluntario v= new LogVoluntario();
+        v.setCodVoluntario(cod);
+        v.setNome(nome);
+        v.setGps(gps);
+        v.setRaio(raio);
+        v.setUsername(user);
+        v.setPassword(pass);
+        v.setDisponibilidade(tf);
+        v.setClassificacoes(new ArrayList<>());
+        if(ExisteVoluntario(user)) throw new VoluntarioExisteException("Já existe um registo para esse username");
+        this.voluntarios.put(v.getUsername(),v.clone());
+    }
+
+    public void associaUtilizador(String cod,String nome, Localizacao pos, String username, String pass) throws UtilizadorExisteException,UsernameJaEstaEmUsoException{
+        if(userEmUso(username))
+            throw new UsernameJaEstaEmUsoException("Ja existe um registo com este username");
+
+        LogUtilizador u=new LogUtilizador();
+        u.setCodUtilizador(cod);
+        u.setNome(nome);
+        u.setGps(pos);
+        u.setUsername(username);
+        u.setPassword(pass);
+        if(ExisteUtilizador(username)) throw new UtilizadorExisteException("Já existe um registo para esse username");
+        this.utilizadores.put(u.getUsername(), u.clone());
+    }
+
+    //transportadoras
+    public void associaTransportadora(String cod,String nome, Localizacao gps, String nif, double raio, double precokm, String user, String password) throws TransportadoraExisteException,UsernameJaEstaEmUsoException{
+        if(userEmUso(user))
+            throw new UsernameJaEstaEmUsoException("Ja existe um registo com este username");
+
+        LogTransportadora t=new LogTransportadora();
+        t.setCodEmpresa(cod);
+        t.setNome(nome);
+        t.setGps(gps);
+        t.setNif(nif);
+        t.setRaio(raio);
+        t.setPrecokm(precokm);
+        t.setUsername(user);
+        t.setPassword(password);
+        t.setClassificacoes(new ArrayList<>());
+        if(ExisteTransportadora(user)) throw new TransportadoraExisteException("Já existe um registo para esse username");
+        this.transportadoras.put(t.getUsername(),t.clone());
     }
 
     //método que cria um novo código para
@@ -370,117 +479,77 @@ public class BaseDados implements Serializable {
         }
     }
 
-    //metodo que verifica em que lojas é que um determinado produto existe
-    public Set<String> produtoExisteGlobal(String descricao) throws ProdutoNaoExisteException{
-        Set<String> nomes=new TreeSet<>();
-        for(LogLoja x : this.lojas.values()){
-            for(Produto p : x.getProdutos()){
-                if(p.getDescricao().equals(descricao)){
-                    nomes.add(x.getNome());
-                }
-            }
+    public Localizacao getLocalizacaoUtilizador(String username){
+        Localizacao b = new Localizacao();
+        for(LogUtilizador c : this.getUtilizadores().values()){
+            if(c.getUsername().equals(username))
+                b =  c.getGps();
         }
-        if (nomes.isEmpty()) throw new ProdutoNaoExisteException("O produto não existe!");
-
-        return nomes;
+        return b;
     }
 
-    //metodo que verifica se um deteminado produto existe
-    public boolean produtoExiste(String user, String CodProd){
-        LogLoja log=this.lojas.get(user);
-        List<Produto> p=log.getProdutos();
-        for (Produto pr: p){
-            if (pr.getCodProd().equals(CodProd))
-                return true;
+    public Localizacao getLocalizacaoLoja(String username){
+        Localizacao b = new Localizacao();
+        for(LogLoja c : this.getLojas().values()){
+            if(c.getUsername().equals(username))
+                b =  c.getGps();
         }
-        return false;
+        return b;
     }
 
-    //método que adiciona um novo produto ou atualiza o stock de uma determinada loja
-    public void addProduto(String user, Produto novo) throws LojaNaoExisteException {
-        if (!ExisteLoja(user))
-            throw new LojaNaoExisteException("A Loja não existe");
-        LogLoja l = this.lojas.get(user);
-        ArrayList<Produto> p = l.getProdutos();
-        if (produtoExiste(user, novo.getCodProd())) {
-            for (Produto pr : p) {
-                if (pr.getCodProd().equals(novo.getCodProd())) {
-                    pr.setStock(pr.getStock()+novo.getStock());
-                }
-            }
-        } else {
-            p.add(novo);
-            l.setProdutos(p);
+    public Localizacao getLocalizacaoTransportadora(String username){
+        Localizacao b = new Localizacao();
+        for(LogTransportadora c : this.getTrasnportadoras().values()){
+            if(c.getUsername().equals(username))
+                b =  c.getGps();
         }
+        return b;
     }
 
-    //método que remove um produto de uma determinada loja
-    public void removeProduto(String user, Produto x) throws LojaNaoExisteException, ProdutoNaoExisteException{
-        if(!ExisteLoja(user))
-            throw new LojaNaoExisteException("Loja não existe!");
-        if(!produtoExiste(user,x.getCodProd()))
-            throw  new ProdutoNaoExisteException("Produto não existe!");
-        LogLoja log=this.lojas.get(user);
-        List<Produto> p=log.getProdutos();
-        p.removeIf(pr -> pr.equals(x));
-    }
-
-    //método que reduz o stock de um produto de uma loja
-    public void reduzStock(String user, String codprod, int stock) throws LojaNaoExisteException, ProdutoNaoExisteException{
-        if(!ExisteLoja(user))
-            throw new LojaNaoExisteException("Loja não existe!");
-        if(!produtoExiste(user, codprod))
-            throw new ProdutoNaoExisteException("Produto não existe!");
-
-        LogLoja log=this.lojas.get(user);
-        List<Produto> pr=log.getProdutos();
-        for(Produto p: pr){
-            if(p.getCodProd().equals(codprod)){
-                p.setStock(p.getStock()-stock);
-            }
+    public Localizacao getLocalizacaoVoluntario(String username){
+        Localizacao b = new Localizacao();
+        for(LogVoluntario c : this.getVoluntarios().values()){
+            if(c.getUsername().equals(username))
+                b =  c.getGps();
         }
+        return b;
     }
 
-    //método que adicona uma classificação
-    //a uma transportadora
-    public void classifTrans(String user, Classificacao classif) throws TransportadoraNaoExisteException{
-        if(!ExisteTransportadora(user))
-            throw new TransportadoraNaoExisteException("A empresa transportadora não existe!");
-        List<Classificacao> cl= this.transportadoras.get(user).getClassificacoes();
-        cl.add(classif);
+    public LogUtilizador getUtilizador(String username){
+        for(LogUtilizador c : this.utilizadores.values()){
+            if(c.getCodUtilizador().equals(username))
+                return c;        }
+        return null;
     }
 
-    //a um voluntario
-    public void classifVol(String user, Classificacao classif) throws VoluntarioNaoExisteException{
-        if(!ExisteVoluntario(user))
-            throw new VoluntarioNaoExisteException("O voluntário não existe!");
-        List<Classificacao> cl= this.voluntarios.get(user).getClassificacoes();
-        cl.add(classif);
+    public LogLoja getLoja(String username){
+        for(LogLoja c : this.lojas.values()){
+            if(c.getCodLoja().equals(username))
+                return c;        }
+        return null;
     }
 
-    //método que determina a classificacao média
-    //das transportadoras
-    public double classifMediaTrans(String user) throws TransportadoraNaoExisteException{
-        if(!ExisteTransportadora(user))
-            throw new TransportadoraNaoExisteException("A empresa transportadora não existe!");
-        List<Classificacao> cl =this.transportadoras.get(user).getClassificacoes();
-        double count=0;
-        for(Classificacao c: cl){
-            count+=c.getClassificacao();
+    public LogTransportadora getTransportadora(String username){
+        for(LogTransportadora c : this.transportadoras.values()){
+            if(c.getCodEmpresa().equals(username))
+                return c;        }
+        return null;
+    }
+
+    public LogVoluntario getVoluntario(String username){
+        for(LogVoluntario c : this.voluntarios.values()){
+            if(c.getCodVoluntario().equals(username))
+                return c;        }
+        return null;
+    }
+
+    public Set<String> lojasOrdemAlfabetica(){
+        Set<String> s = new TreeSet<>();
+        for(LogLoja a : this.getLojas().values()){
+            s.add(a.getNome());
         }
-
-        return count/cl.size();
+        return s;
     }
 
-    //dos voluntarios
-    public double classifMediaVol(String user) throws VoluntarioNaoExisteException{
-        if(!ExisteVoluntario(user))
-            throw new VoluntarioNaoExisteException("O voluntario não existe!");
-        List<Classificacao> cl=this.voluntarios.get(user).getClassificacoes();
-        double count=0;
-        for(Classificacao c: cl){
-            count+=c.getClassificacao();
-        }
-        return count/cl.size();
-    }
+
 }
