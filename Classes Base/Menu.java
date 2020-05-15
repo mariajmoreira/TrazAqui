@@ -169,6 +169,14 @@ public class Menu
       }
   }
 
+    public CatalogoProdutos buscaCatalogo(String cod){
+        for(CatalogoProdutos c : a_armazena.getCatalogos()){
+            if(cod == c.getCodLoja()){
+                return c;
+            }
+        }
+        return null;
+    }
 
     /**
      * ASSOCIAR CONTA CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO
@@ -183,7 +191,6 @@ public class Menu
         String username = s.nextLine();
         System.out.println("Introduza o seu Password");
         String pass = s.nextLine();
-
 
         try{
             b_dados.associaUtilizador(u.getCodUtilizador(),u.getNome(),u.getGps(),username,pass);
@@ -208,10 +215,11 @@ public class Menu
         String username = s.nextLine();
         System.out.println("Introduza o seu Password");
         String pass = s.nextLine();
+        CatalogoProdutos cp = buscaCatalogo(cod);
 
 
         try{
-            b_dados.associaLoja(l.getCodLoja(),l.getNome(),l.getGps(),username,pass);
+            b_dados.associaLoja(l.getCodLoja(),l.getNome(),l.getGps(),username,pass,cp);
         }
 
         catch(LojaExisteException e){
@@ -329,7 +337,7 @@ public class Menu
         Localizacao pos = new Localizacao(gpsx,gpsy);
 
         try{
-            b_dados.novaLoja(nome, pos,username,pass);
+            b_dados.novaLoja(nome,pos,username,pass);
         }
 
         catch(LojaExisteException e){
@@ -536,8 +544,12 @@ public class Menu
         }
     }
 
-    private void consultarProdutos(String username){
-        System.out.println(b_dados.getLoja(username).getCatalogoProdutos().toString());
+    private void consultarProdutos(String cod){
+        for(CatalogoProdutos c : a_armazena.getCatalogos()){
+            if(cod == c.getCodLoja()){
+                System.out.println(c);
+            }
+        }
     }
 
 
@@ -596,7 +608,7 @@ public class Menu
 
                 switch(opcao){
                     case 1:
-                        consultarProdutos(username);
+                        consultarProdutos(b_dados.getLoja(username).getCodLoja());
                         break;
                     case 2:
                         consultadadosLoja(username);
