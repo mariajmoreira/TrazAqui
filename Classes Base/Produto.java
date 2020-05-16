@@ -1,10 +1,10 @@
-package trazAqui;
+package trazaqui;
 
 public class Produto {
     private String codProd;
     private String descricao;
     private double precoUnitario;
-    private int stock;
+    private double stock;
 
 
     public Produto() {
@@ -14,7 +14,7 @@ public class Produto {
         this.stock=0;
     }
 
-    public Produto(String cod, String descricao, double preco, int qnt) {
+    public Produto(String cod, String descricao, double preco, double qnt) {
         this.codProd = cod;
         this.descricao = descricao;
         this.precoUnitario = preco;
@@ -52,11 +52,11 @@ public class Produto {
         this.precoUnitario = preco;
     }
 
-    public int getStock() {
+    public double getStock() {
         return this.stock;
     }
 
-    public void setStock(int qnt) { this.stock = qnt;
+    public void setStock(double qnt) { this.stock = qnt;
     }
 
     public Produto clone() {
@@ -66,17 +66,18 @@ public class Produto {
     public boolean equals(Object obj) {
         if(obj==this) return true;
         if(obj==null || obj.getClass() != this.getClass()) return false;
-        LinhaEncomenda le = (LinhaEncomenda) obj;
+        Produto le = (Produto) obj;
         return le.getCodProd().equals(this.codProd) &&
                 le.getDescricao().equals(this.descricao) &&
-                le.getPreco() == this.precoUnitario;
+                le.getPreco() == this.precoUnitario &&
+                le.getStock() == this.stock;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Encomendas:\n").append("Codigo Produto:").append(this.codProd).append("\n").append("Descriçao:")
                 .append(this.descricao).append("\n").append("Preco:").append(this.precoUnitario)
-                .append("\n");
+                .append("\n").append("Stock:").append(this.stock);
         return sb.toString();
     }
 }
