@@ -615,41 +615,11 @@ public class BaseDados implements Serializable {
         return b;
     }
 
-    //método para obter um user através do seu username
-    //User
-    public LogUtilizador getUtilizador(String username){
-        for(LogUtilizador c : this.utilizadores.values()){
-            if(c.getCodUtilizador().equals(username))
-                return c;        }
-        return null;
-    }
-
-    //Loja
-    public LogLoja getLoja(String username){
-        for(LogLoja c : this.lojas.values()){
-            if(c.getCodLoja().equals(username))
-                return c;        }
-        return null;
-    }
-
-    //Transportadora
-    public LogTransportadora getTransportadora(String username){
-        for(LogTransportadora c : this.transportadoras.values()){
-            if(c.getCodEmpresa().equals(username))
-                return c;        }
-        return null;
-    }
-
-    //Voluntario
-    public LogVoluntario getVoluntario(String username){
-        for(LogVoluntario c : this.voluntarios.values()){
-            if(c.getCodVoluntario().equals(username))
-                return c;        }
-        return null;
-    }
-
     //Método que ordena as lojas por ordem alfabética
-    public Set<String> lojasOrdemAlfabetica(){
+    public Set<String> lojasOrdemAlfabetica() throws NaoExisteLojasRegistadasException{
+        if(this.getLojas().isEmpty()){
+            throw new NaoExisteLojasRegistadasException("Nao existem lojas registadas!");
+        }
         Set<String> s = new TreeSet<>();
         for(LogLoja a : this.getLojas().values()){
             s.add(a.getNome());

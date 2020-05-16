@@ -136,21 +136,24 @@ public class Menu
         String opcao = "";
         try {
             do {
+                Set<String> alfa=b_dados.lojasOrdemAlfabetica();
                 System.out.println("Escreva o nome da loja que deseja visitar!");
-                lojasOrdemAlfabeticaDisplay(a_armazena.lojasOrdemAlfabetica());
+                lojasOrdemAlfabeticaDisplay(alfa);
 
                 System.out.println("0 - Retroceder");
 
                 opcao = s.nextLine();
                 System.out.print("\n");
-
                 for (LogLoja l : b_dados.getLojas().values()) {
-                    if (opcao == l.getNome()) {
+                    if (l.getNome().equals(opcao)) {
                         System.out.println(l.getCatalogoProdutos().toString());
                     }
                 }
             }
-            while(opcao != "");
+            while(opcao.equals(""));
+        }
+        catch (NaoExisteLojasRegistadasException e){
+            System.out.println(e.getMessage());
         }
         catch(InputMismatchException e) {
             System.out.println("Entrada inválida");
@@ -169,7 +172,7 @@ public class Menu
 
     public CatalogoProdutos buscaCatalogo(String cod){
         for(CatalogoProdutos c : a_armazena.getCatalogos()){
-            if(cod == c.getCodLoja()){
+            if(cod.equals(c.getCodLoja())){
                 return c;
             }
         }
@@ -555,6 +558,7 @@ public class Menu
      * MENUS CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO
      */
     private void menuCliente(String username){
+        a_armazena.juntaCatalogos();
         Scanner s = new Scanner(System.in); int opcao = 0;
         try{
             do{
