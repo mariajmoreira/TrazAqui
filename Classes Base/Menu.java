@@ -1030,4 +1030,39 @@ public class Menu
 
         }
     }
+
+    public double calculaPreco(double preco,double stock,double quant){
+        return ((preco*quant)/stock);
+    }
+
+    public Encomenda fazerEncomenda(String codLoja,String codUtilizador){
+        Scanner s = new Scanner(System.in);
+        List<LinhaEncomenda> encs = new ArrayList<>();
+        String opcao = "";
+        try {
+            do {
+                System.out.println("Para adicionar um produto ao carrinho introduza o código do produto!");
+                opcao = s.nextLine();
+                System.out.print(opcao);
+                Produto p = buscaCatalogo(codLoja).getProduto(opcao);
+                System.out.println("Indique a quantidade");
+                double q = Double.parseDouble(s.nextLine());
+                System.out.print(q);
+                double preco = calculaPreco(p.getPreco(), p.getStock(), q);
+
+                System.out.print("\n");
+                LinhaEncomenda l = new LinhaEncomenda(opcao, p.getDescricao(), preco, q);
+                encs.add(l);
+            }
+            while(opcao == "");
+        }
+        catch(CodigoNaoExisteException e) {
+            System.out.println("Entrada inválida");
+        }
+        catch(InputMismatchException e) {
+            System.out.println("Entrada inválida");
+        }
+        return new Encomenda(GERAR CODIGO ENCOMENDA,codUtilizador, codLoja, double p,encs);
+    }
+
 }
