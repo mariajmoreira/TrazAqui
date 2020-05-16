@@ -1,10 +1,8 @@
-package trazAqui;
+package trazaqui;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import trazAqui.Exceptions.*;
-
+import trazaqui.Exceptions.*;
 import java.time.format.DateTimeParseException;
 
 public class Menu
@@ -162,12 +160,12 @@ public class Menu
     /**
      *Lojas por ordem alfabetica
      */
-  public void lojasOrdemAlfabeticaDisplay(Set<String> s) {
-      Iterator<String> it = s.iterator();
-      while (it.hasNext()) {
-          System.out.println(it.next());
-      }
-  }
+    public void lojasOrdemAlfabeticaDisplay(Set<String> s) {
+        Iterator<String> it = s.iterator();
+        while (it.hasNext()) {
+            System.out.println(it.next());
+        }
+    }
 
     public CatalogoProdutos buscaCatalogo(String cod){
         for(CatalogoProdutos c : a_armazena.getCatalogos()){
@@ -404,7 +402,7 @@ public class Menu
         System.out.println("2-Nao");
         int d = Integer.parseInt(s.nextLine());
         if(d == 1){
-           disponibilidade = true;
+            disponibilidade = true;
         } if(d==2){
             disponibilidade =false;
         }
@@ -429,7 +427,7 @@ public class Menu
         try{
             do{
                 System.out.println("Informações de Conta ");
-                System.out.println(b_dados.getUtilizador(username).toString());
+                System.out.println(b_dados.getUtilizadores().get(username).toString());
                 System.out.println("1-Mudar localizacao");
                 System.out.println("0 - Retroceder");
 
@@ -459,7 +457,7 @@ public class Menu
         try{
             do{
                 System.out.println("Informações de Conta ");
-                System.out.println(b_dados.getLoja(username).toString());
+                System.out.println(b_dados.getLojas().get(username).toString());
                 System.out.println("1-Mudar localizacao");
                 System.out.println("0 - Retroceder");
 
@@ -489,7 +487,7 @@ public class Menu
         try{
             do{
                 System.out.println("Informações de Conta ");
-                System.out.println(b_dados.getTransportadora(username).toString());
+                System.out.println(b_dados.getTrasnportadoras().get(username).toString());
                 System.out.println("1-Mudar localizacao");
                 System.out.println("0 - Retroceder");
 
@@ -519,7 +517,7 @@ public class Menu
         try{
             do{
                 System.out.println("Informações de Conta ");
-                System.out.println(b_dados.getVoluntario(username).toString());
+                System.out.println(b_dados.getVoluntarios().get(username).toString());
                 System.out.println("1-Mudar localizacao");
                 System.out.println("0 - Retroceder");
 
@@ -546,7 +544,7 @@ public class Menu
 
     private void consultarProdutos(String cod){
         for(CatalogoProdutos c : a_armazena.getCatalogos()){
-            if(cod == c.getCodLoja()){
+            if(c.getCodLoja().equals(cod)){
                 System.out.println(c);
             }
         }
@@ -593,6 +591,7 @@ public class Menu
     }
 
     private void menuLoja(String username){
+        a_armazena.juntaCatalogos();
         Scanner s = new Scanner(System.in); int opcao = 0;
         try{
             do{
@@ -608,7 +607,7 @@ public class Menu
 
                 switch(opcao){
                     case 1:
-                        consultarProdutos(b_dados.getLoja(username).getCodLoja());
+                        consultarProdutos(b_dados.getLojas().get(username).getCodLoja());
                         break;
                     case 2:
                         consultadadosLoja(username);
