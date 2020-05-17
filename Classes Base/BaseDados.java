@@ -10,6 +10,7 @@ public class BaseDados implements Serializable {
     private Map <String,LogTransportadora> transportadoras;
     private Map <String,LogVoluntario> voluntarios;
     private Map <String,LogLoja> lojas;
+    private Map <String,Encomenda> encomendas;
 
     //getters
     public Map<String,LogUtilizador> getUtilizadores(){return new HashMap<>(this.utilizadores);}
@@ -20,6 +21,8 @@ public class BaseDados implements Serializable {
 
     public Map<String, LogLoja> getLojas(){return new HashMap<>(this.lojas);}
 
+    public Map<String, Encomenda> getEncomendas(){return new HashMap<>(this.encomendas);}
+
     //setters
     public void setUtilizadores(Map<String,LogUtilizador> user){this.utilizadores=new HashMap<>(user);}
 
@@ -28,6 +31,8 @@ public class BaseDados implements Serializable {
     public void setVoluntarios(Map<String,LogVoluntario> vol){this.voluntarios=new HashMap<>(vol);}
 
     public void setLojas(Map<String,LogLoja> loj){this.lojas=new HashMap<>(loj);}
+
+    public void setEncomendas(Map<String,Encomenda> enc){this.encomendas=new HashMap<>(enc);}
 
     //clone
     public BaseDados clone(){return new BaseDados(this);}
@@ -38,14 +43,16 @@ public class BaseDados implements Serializable {
         this.transportadoras=new HashMap<>();
         this.voluntarios=new HashMap<>();
         this.lojas=new HashMap<>();
+        this.encomendas=new HashMap<>();
     }
 
     //construtor parametrizado
-    public BaseDados(Map<String,LogUtilizador> user,Map<String,LogTransportadora> trans, Map<String,LogVoluntario> vol, Map<String,LogLoja> loj){
+    public BaseDados(Map<String,LogUtilizador> user,Map<String,LogTransportadora> trans, Map<String,LogVoluntario> vol, Map<String,LogLoja> loj, Map<String,Encomenda> enc){
         setUtilizadores(user);
         setTransportadoras(trans);
         setVoluntarios(vol);
         setLojas(loj);
+        setEncomendas(enc);
     }
 
     //construtor por copia
@@ -54,6 +61,7 @@ public class BaseDados implements Serializable {
         setTransportadoras(bd.getTrasnportadoras());
         setVoluntarios(bd.getVoluntarios());
         setLojas(bd.getLojas());
+        setEncomendas(bd.getEncomendas());
     }
 
     //metodo equals
@@ -80,6 +88,11 @@ public class BaseDados implements Serializable {
         }
         for (LogLoja ls: bd.lojas.values() ){
             if(!this.lojas.containsValue(ls)){
+                return false;
+            }
+        }
+        for (Encomenda e:bd.encomendas.values()){
+            if(!this.encomendas.containsValue(e)){
                 return false;
             }
         }
@@ -128,6 +141,51 @@ public class BaseDados implements Serializable {
     public boolean ExisteLoja(String user){
         return lojas.containsKey(user);
     }
+
+    //método que verifica se um determinado código existe
+    //utilizador
+    public boolean ExisteCodUser(String cod){
+        for(LogUtilizador lu: this.utilizadores.values()){
+            if(lu.getCodUtilizador().equals(cod)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //transportadora
+    public boolean ExisteCodTrans(String cod){
+        for(LogTransportadora lt: this.transportadoras.values()){
+            if(lt.getCodEmpresa().equals(cod))
+                return true;
+        }
+        return false;
+    }
+
+    //voluntarios
+    public boolean ExisteCodVoluntario(String cod){
+        for(LogVoluntario lv: this.voluntarios.values()){
+            if(lv.getCodVoluntario().equals(cod))
+                return true;
+        }
+        return false;
+    }
+
+    //lojas
+    public boolean ExisteCodLoja(String cod){
+        for(LogTransportadora lt: this.transportadoras.values()){
+            return true;
+        }
+        return false;
+    }
+
+    //encomendas
+    public boolean ExisteEncomenda(String cod){
+        return this.encomendas.containsKey(cod);
+    }
+
+
+    //método que verifica
 
     //metodo que verifica a correspondência do username e da password introduzidos
     //pelo utilizador
@@ -230,6 +288,8 @@ public class BaseDados implements Serializable {
         this.transportadoras.put(t.getUsername(),t.clone());
     }
 
+    //
+
     //voluntarios
     public void novoVoluntario(String nome, Localizacao gps, double raio, String user, String pass, boolean tf) throws UsernameJaEstaEmUsoException, VoluntarioExisteException {
         if(userEmUso(user))
@@ -268,6 +328,17 @@ public class BaseDados implements Serializable {
         this.lojas.put(l.getUsername(),l.clone());
     }
 
+    //encomenda
+    public void novaEncomenda(String codUtilizador, String codLoja, double peso, ArrayList<LinhaEncomenda> linhas){
+        String cod=novoCodEncomenda();
+        Encomenda e= new Encomenda();
+        e.setCodEncomenda(cod);
+        e.setCodUtilizador(codUtilizador);
+        e.setCodEncomenda(codLoja);
+        e.setPeso(peso);
+        e.setLinhas(linhas);
+        this.encomendas.put(e.getcodEncomenda(),e.clone());
+    }
     /**
      * ASSOCIAR CONTA CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO
      */
@@ -348,7 +419,7 @@ public class BaseDados implements Serializable {
         }
         Random rand= new Random();
         String confirma="u"+count;
-        while(ExisteUtilizador(confirma)){
+        while(ExisteCodUser(confirma)){
             confirma="u"+ rand.nextInt(count + 2);
         }
 
@@ -364,9 +435,9 @@ public class BaseDados implements Serializable {
             if(Integer.parseInt(cod)>count) count=Integer.parseInt(cod);
         }
         Random rand=new Random();
-        String confirma="u"+count;
-        while(ExisteTransportadora(confirma)){
-            confirma="u"+rand.nextInt(count+2);
+        String confirma="t"+count;
+        while(ExisteCodTrans(confirma)){
+            confirma="t"+rand.nextInt(count+2);
         }
         return confirma;
     }
@@ -380,9 +451,25 @@ public class BaseDados implements Serializable {
             if(Integer.parseInt(cod)>count) count=Integer.parseInt(cod);
         }
         Random rand=new Random();
-        String confirma="u"+count;
-        while(ExisteTransportadora(confirma)){
-            confirma="u"+rand.nextInt(count+2);
+        String confirma="v"+count;
+        while(ExisteCodTrans(confirma)){
+            confirma="v"+rand.nextInt(count+2);
+        }
+        return confirma;
+    }
+
+    //encomenda
+    public String novoCodEncomenda(){
+        int count=0;
+        String cod;
+        for(Encomenda e: this.encomendas.values()){
+            cod=e.getcodEncomenda().substring(1);
+            if(Integer.parseInt(cod)>count) count=Integer.parseInt(cod);
+        }
+        Random rand=new Random();
+        String confirma="e"+count;
+        while(ExisteEncomenda(confirma)){
+            confirma="e"+rand.nextInt(count+2);
         }
         return confirma;
     }
@@ -396,9 +483,9 @@ public class BaseDados implements Serializable {
             if(Integer.parseInt(cod)>count) count=Integer.parseInt(cod);
         }
         Random rand=new Random();
-        String confirma="u"+count;
-        while(ExisteTransportadora(confirma)){
-            confirma="u"+rand.nextInt(count+2);
+        String confirma="l"+count;
+        while(ExisteCodLoja(confirma)){
+            confirma="l"+rand.nextInt(count+2);
         }
         return confirma;
     }
