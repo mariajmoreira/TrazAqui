@@ -1,8 +1,10 @@
-package trazaqui;
+package trazAqui;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import trazaqui.Exceptions.*;
+
+import trazAqui.Exceptions.*;
+
 import java.time.format.DateTimeParseException;
 
 public class Menu
@@ -131,7 +133,47 @@ public class Menu
         b_dados.setLocalizacaovoluntario(username, cordx, cordy);
     }
 
-    private void verLojas() {
+    public double calculaPreco(double preco,double stock,double quant){
+        return ((preco*quant)/stock);
+    }
+
+    public double calculaPeso(List<LinhaEncomenda> l){
+        double res=0;
+        for(LinhaEncomenda e : l){
+            res+=e.getQuantidade();
+        }
+        return res;
+    }
+
+    public void fazerEncomenda(String codLoja,String codUtilizador){
+        Scanner s = new Scanner(System.in);
+        ArrayList<LinhaEncomenda> encs = new ArrayList<>();
+        String opcao = "";
+        try {
+            do {
+                System.out.println("Para adicionar um produto ao carrinho introduza o código do produto!");
+                opcao = s.nextLine();
+                System.out.print(opcao);
+                Produto p = buscaCatalogo(codLoja).getProduto(opcao);
+                System.out.println("Indique a quantidade");
+                double q = Double.parseDouble(s.nextLine());
+                System.out.print(q);
+                double preco = calculaPreco(p.getPreco(), p.getStock(), q);
+
+                System.out.print("\n");
+                LinhaEncomenda l = new LinhaEncomenda(opcao, p.getDescricao(), preco, q);
+                encs.add(l);
+            }
+            while(opcao.equals(""));
+        }
+        catch(InputMismatchException e) {
+            System.out.println("Entrada inválida");
+        }
+        double peso = calculaPeso(encs);
+        b_dados.novaEncomenda(codUtilizador, codLoja,peso,encs);
+    }
+
+    private void verLojas(String codUtilizador) {
         Scanner s = new Scanner(System.in);
         String opcao = "";
         try {
@@ -147,6 +189,7 @@ public class Menu
                 for (LogLoja l : b_dados.getLojas().values()) {
                     if (l.getNome().equals(opcao)) {
                         System.out.println(l.getCatalogoProdutos().toString());
+                        fazerEncomenda(codUtilizador,l.getCodLoja());
                     }
                 }
             }
@@ -554,6 +597,8 @@ public class Menu
     }
 
 
+
+
     /**
      * MENUS CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO
      */
@@ -575,7 +620,7 @@ public class Menu
 
                 switch(opcao){
                     case 1:
-                        verLojas();
+                        verLojas(b_dados.getUtilizadores().get(username).getCodUtilizador());
                         break;
                     case 2:
                         consultadadosUtilizador(username);
@@ -650,7 +695,7 @@ public class Menu
 
                 switch(opcao){
                     case 1:
-                        verLojas();
+
                         break;
                     case 2:
                         consultadadosTransportadora(username);
@@ -688,7 +733,7 @@ public class Menu
 
                 switch(opcao){
                     case 1:
-                        verLojas();
+
                         break;
                     case 2:
                         verLocalizacaoVoluntario(username);
@@ -1030,39 +1075,4 @@ public class Menu
 
         }
     }
-
-    public double calculaPreco(double preco,double stock,double quant){
-        return ((preco*quant)/stock);
-    }
-
-    public Encomenda fazerEncomenda(String codLoja,String codUtilizador){
-        Scanner s = new Scanner(System.in);
-        List<LinhaEncomenda> encs = new ArrayList<>();
-        String opcao = "";
-        try {
-            do {
-                System.out.println("Para adicionar um produto ao carrinho introduza o código do produto!");
-                opcao = s.nextLine();
-                System.out.print(opcao);
-                Produto p = buscaCatalogo(codLoja).getProduto(opcao);
-                System.out.println("Indique a quantidade");
-                double q = Double.parseDouble(s.nextLine());
-                System.out.print(q);
-                double preco = calculaPreco(p.getPreco(), p.getStock(), q);
-
-                System.out.print("\n");
-                LinhaEncomenda l = new LinhaEncomenda(opcao, p.getDescricao(), preco, q);
-                encs.add(l);
-            }
-            while(opcao == "");
-        }
-        catch(CodigoNaoExisteException e) {
-            System.out.println("Entrada inválida");
-        }
-        catch(InputMismatchException e) {
-            System.out.println("Entrada inválida");
-        }
-        return new Encomenda(GERAR CODIGO ENCOMENDA,codUtilizador, codLoja, double p,encs);
-    }
-
 }
