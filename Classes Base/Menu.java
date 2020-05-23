@@ -145,32 +145,67 @@ public class Menu
         return res;
     }
 
-    public void fazerEncomenda(String codLoja,String codUtilizador){
-        Scanner s = new Scanner(System.in);
-        ArrayList<LinhaEncomenda> encs = new ArrayList<>();
-        String opcao = "";
-        try {
-            do {
-                System.out.println("Para adicionar um produto ao carrinho introduza o código do produto!");
-                opcao = s.nextLine();
-                System.out.print(opcao);
-                Produto p = buscaCatalogo(codLoja).getProduto(opcao);
-                System.out.println("Indique a quantidade");
-                double q = Double.parseDouble(s.nextLine());
-                System.out.print(q);
-                double preco = calculaPreco(p.getPreco(), p.getStock(), q);
 
-                System.out.print("\n");
-                LinhaEncomenda l = new LinhaEncomenda(opcao, p.getDescricao(), preco, q);
-                encs.add(l);
+    public void fazerEncomenda(String codLoja,String codUtilizador){
+        ArrayList<LinhaEncomenda> encs = new ArrayList<>();
+        try {
+            String opcao;
+            do {
+                System.out.println("1 -Adicionar um produto ao carrinho");
+                System.out.println("2 - Remover um produto do carrinho");
+                System.out.println("3 - Efetuar encomenda");
+                System.out.println("0 - Retroceder");
+
+                Scanner s = new Scanner(System.in);
+                opcao = s.nextLine() ;
+
+                switch (opcao) {
+                    case "1":
+                        System.out.println("Introduza o código do produto!");
+                        opcao = s.nextLine();
+                        System.out.print(opcao);
+                        System.out.print("\n");
+                        Produto p = buscaCatalogo(codLoja).getProduto(opcao);
+                        System.out.println("Indique a quantidade");
+                        double q = Double.parseDouble(s.nextLine());
+                        System.out.print(q);
+                        System.out.print("\n");
+                        double preco = calculaPreco(p.getPreco(), p.getStock(), q);
+                        System.out.print(preco);
+                        System.out.print("\n");
+                        LinhaEncomenda l = new LinhaEncomenda(opcao, p.getDescricao(), preco, q);
+                        encs.add(l);
+                        System.out.print("Carrinho:");
+                        System.out.print(encs);
+                        System.out.print("\n");
+                        break;
+                    case "2":
+
+                    case "3":
+                        double peso = calculaPeso(encs);
+                        Encomenda e = b_dados.novaEncomenda(codUtilizador, codLoja, peso, encs);
+                        System.out.print("Encomenda efetuada com sucesso!\n");
+                        System.out.print("Codigo da sua Encomenda:" + e.getcodEncomenda());
+                        System.out.print("\n");
+                    case "0":
+                        menuCliente(codUtilizador);
+                    default:
+                        System.out.print("Opção inválida\n\n");
+                        break;
+
+                }
             }
-            while(opcao.equals(""));
+            while (!opcao.equals("0") || !opcao.equals("2"));
+        }
+        catch(CatalogoNaoExisteException e) {
+            System.out.println("Nao existe catalogo");
+        }
+        catch(ProdutoNaoExisteException e) {
+            System.out.println("Nao existe produto");
         }
         catch(InputMismatchException e) {
             System.out.println("Entrada inválida");
         }
-        double peso = calculaPeso(encs);
-        b_dados.novaEncomenda(codUtilizador, codLoja,peso,encs);
     }
 
     private void verLojas(String codUtilizador) {
@@ -189,7 +224,7 @@ public class Menu
                 for (LogLoja l : b_dados.getLojas().values()) {
                     if (l.getNome().equals(opcao)) {
                         System.out.println(l.getCatalogoProdutos().toString());
-                        fazerEncomenda(codUtilizador,l.getCodLoja());
+                        fazerEncomenda(l.getCodLoja(),codUtilizador);
                     }
                 }
             }
@@ -213,13 +248,13 @@ public class Menu
         }
     }
 
-    public CatalogoProdutos buscaCatalogo(String cod){
+    public CatalogoProdutos buscaCatalogo(String cod) throws CatalogoNaoExisteException{
         for(CatalogoProdutos c : a_armazena.getCatalogos()){
             if(cod.equals(c.getCodLoja())){
                 return c;
             }
         }
-        return null;
+        throw new CatalogoNaoExisteException();
     }
 
     /**
@@ -251,7 +286,7 @@ public class Menu
 
     private void associarContaLoja(){
         Scanner s = new Scanner(System.in);
-        System.out.println("Introduza o seu Codigo de Utilizador");
+        System.out.println("Introduza o seu Codigo de Loja");
         String cod = s.nextLine();
         Loja l = a_armazena.getLoja(cod);
         System.out.println(l.toString());
@@ -259,7 +294,13 @@ public class Menu
         String username = s.nextLine();
         System.out.println("Introduza o seu Password");
         String pass = s.nextLine();
-        CatalogoProdutos cp = buscaCatalogo(cod);
+        CatalogoProdutos cp = new CatalogoProdutos();
+        try {
+            cp = buscaCatalogo(cod);
+        }
+        catch(CatalogoNaoExisteException e){
+            System.out.println(e.getMessage());
+        }
 
 
         try{
@@ -276,7 +317,7 @@ public class Menu
 
     private void associarContaTransportadora(){
         Scanner s = new Scanner(System.in);
-        System.out.println("Introduza o seu Codigo de Utilizador");
+        System.out.println("Introduza o seu Codigo de Transportadora");
         String cod = s.nextLine();
         Transportadora t = a_armazena.getTransportadora(cod);
         System.out.println(t.toString());
@@ -302,7 +343,7 @@ public class Menu
     private void associarContaVoluntario(){
         boolean disponibilidade = true;
         Scanner s = new Scanner(System.in);
-        System.out.println("Introduza o seu Codigo de Utilizador");
+        System.out.println("Introduza o seu Codigo de Voluntario");
         String cod = s.nextLine();
         Voluntario v = a_armazena.getVoluntario(cod);
         System.out.println(v.toString());
@@ -604,6 +645,7 @@ public class Menu
      */
     private void menuCliente(String username){
         a_armazena.juntaCatalogos();
+        a_armazena.JuntaProdutos();
         Scanner s = new Scanner(System.in); int opcao = 0;
         try{
             do{
@@ -641,6 +683,7 @@ public class Menu
 
     private void menuLoja(String username){
         a_armazena.juntaCatalogos();
+        a_armazena.JuntaProdutos();
         Scanner s = new Scanner(System.in); int opcao = 0;
         try{
             do{

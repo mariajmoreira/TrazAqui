@@ -1,4 +1,4 @@
-package trazaqui;
+package trazAqui;
 
 public class Produto {
     private String codProd;
@@ -11,7 +11,7 @@ public class Produto {
         this.codProd = "n/a";
         this.descricao = "n/a";
         this.precoUnitario = 0.0;
-        this.stock=0;
+        this.stock=0.0;
     }
 
     public Produto(String cod, String descricao, double preco, double qnt) {
@@ -75,9 +75,10 @@ public class Produto {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Encomendas:\n").append("Codigo Produto:").append(this.codProd).append("\n").append("Descriçao:")
-                .append(this.descricao).append("\n").append("Preco:").append(this.precoUnitario)
-                .append("\n").append("Stock:").append(this.stock);
+        sb.append("Codigo Produto:").append(this.codProd).append("\n").append("Descriçao:")
+                .append(this.descricao).append("\n").append("Preco:").append(this.precoUnitario).append("\n")
+                .append("Quantidade:").append(this.stock).append("\n")
+                .append("\n\n");
         return sb.toString();
     }
 }

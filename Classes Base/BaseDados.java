@@ -1,9 +1,14 @@
-package trazaqui;
+package trazAqui;
 
-import trazaqui.Exceptions.*;
-
-import java.io.Serializable;
+import trazAqui.Exceptions.*;
 import java.util.*;
+
+import java.time.LocalDate;
+import java.io.FileNotFoundException;
+import java.io.Serializable;
+import java.io.File;
+import java.time.format.DateTimeFormatter;
+
 
 public class BaseDados implements Serializable {
     private Map <String,LogUtilizador> utilizadores;
@@ -329,15 +334,16 @@ public class BaseDados implements Serializable {
     }
 
     //encomenda
-    public void novaEncomenda(String codUtilizador, String codLoja, double peso, ArrayList<LinhaEncomenda> linhas){
+    public Encomenda novaEncomenda(String codUtilizador, String codLoja,double peso, ArrayList<LinhaEncomenda> linhas){
         String cod=novoCodEncomenda();
         Encomenda e= new Encomenda();
         e.setCodEncomenda(cod);
         e.setCodUtilizador(codUtilizador);
-        e.setCodEncomenda(codLoja);
+        e.setCodLoja(codLoja);
         e.setPeso(peso);
         e.setLinhas(linhas);
         this.encomendas.put(e.getcodEncomenda(),e.clone());
+        return e;
     }
     /**
      * ASSOCIAR CONTA CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO

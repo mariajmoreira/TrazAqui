@@ -1,5 +1,7 @@
 package trazAqui;
 
+import trazAqui.Exceptions.ProdutoNaoExisteException;
+
 import java.util.ArrayList;
 
 public class CatalogoProdutos {
@@ -25,18 +27,11 @@ public class CatalogoProdutos {
     }
 
     public ArrayList<Produto> getProdutos(){
-        ArrayList<Produto> aux = new ArrayList<>();
-        for(Produto s : this.produtos){
-            aux.add(s);
-        }
-        return aux;
+       return new ArrayList<>(this.produtos);
     }
 
-    public void setProdutos(ArrayList<Produto> enc){
-        this.produtos= new ArrayList<>();
-        for(Produto s : enc){
-            this.produtos.add(s);
-        }
+    public void setProdutos(ArrayList<Produto> prod){
+        this.produtos= new ArrayList<>(prod);
     }
 
     public String getCodLoja(){
@@ -47,12 +42,22 @@ public class CatalogoProdutos {
         this.codLoja = cod;
     }
 
+    public Produto getProduto(String cod) throws ProdutoNaoExisteException {
+        for(Produto p : this.produtos){
+            if(p.getCodProd().equals(cod)){
+                return p;
+            }
+        }
+       throw new ProdutoNaoExisteException();
+    }
+
     public CatalogoProdutos clone() {
         return new CatalogoProdutos(this);
     }
 
     public String toString(){
         StringBuilder sb = new StringBuilder();
+        sb.append("Codigo Loja:").append(this.codLoja).append("\n");
         sb.append("Produtos:").append(this.produtos).append("\n");
         return sb.toString();
     }
