@@ -1,6 +1,6 @@
-package trazAqui;
+package trazaqui;
 
-import trazAqui.Exceptions.*;
+import trazaqui.Exceptions.*;
 
 import java.io.Serializable;
 import java.util.*;
@@ -15,7 +15,7 @@ public class Armazena implements Serializable {
     private Map <String,Voluntario> voluntarios;
     private Map <String,Encomenda> encomendas;
     private ArrayList<CatalogoProdutos> produtos;
-
+    private ArrayList<String> aceites;
     /**
      * Construtor vazio
      */
@@ -25,19 +25,21 @@ public class Armazena implements Serializable {
         this.transportadoras = new HashMap<>();
         this.voluntarios = new HashMap<>();
         this.encomendas = new HashMap<>();
-        this.produtos = new ArrayList<>();
+        this.produtos=new ArrayList<>();
+        this.aceites=new ArrayList<>();
     }
 
     /**
      * Metodo construtor parameterizado
      */
-    public Armazena( Map<String,Utilizador> u, Map<String,Loja> l, Map<String,Transportadora> t, Map<String,Voluntario> v,Map<String,Encomenda> e, ArrayList<CatalogoProdutos> p){
+    public Armazena( Map<String,Utilizador> u, Map<String,Loja> l, Map<String,Transportadora> t, Map<String,Voluntario> v,Map<String,Encomenda> e,ArrayList<CatalogoProdutos> produtos, ArrayList<String> aceites, Map<String,Encomenda> h){
         setUtilizadores(u);
         setLojas(l);
         setTransportadoras(t);
         setVoluntarios(v);
         setEncomendas(e);
-        setProdutos(p);
+        setCatalogos(produtos);
+        setAceites(aceites);
     }
 
     /**
@@ -50,23 +52,27 @@ public class Armazena implements Serializable {
         setTransportadoras(list.getTransportadoras());
         setVoluntarios(list.getVoluntarios());
         setEncomendas(list.getEncomendas());
-        setProdutos(list.getProdutos());
+        setCatalogos(list.getCatalogos());
+        setAceites(list.getAceites());
     }
 
-    public ArrayList<CatalogoProdutos> getProdutos(){
+    public ArrayList<CatalogoProdutos> getCatalogos(){
         return new ArrayList<>(this.produtos);
     }
 
-    public void setProdutos(ArrayList<CatalogoProdutos> p){
-        this.produtos=new ArrayList<>(p);
+    public void setCatalogos(ArrayList<CatalogoProdutos> produtos){
+        this.produtos=new ArrayList<>(produtos);
     }
+
+    public ArrayList<String> getAceites(){return new ArrayList<>(this.aceites);}
+
+    public void  setAceites(ArrayList<String> aceites){this.aceites=new ArrayList<>(aceites);}
 
     /**
      * Retorna um cliente especifico com base no seu Username
      * @param cod O username do cliente
      * @return Um utilizador
      */
-
     public Utilizador getUtilizador(String cod){
         for(Utilizador c : this.utilizadores.values()){
             if(c.getCodUtilizador().equals(cod))
@@ -301,7 +307,7 @@ public class Armazena implements Serializable {
      */
     public void novoUtilizador(Utilizador u) throws UtilizadorExisteException, CodigoJaEstaEmUsoException{
         if(codEmUso(u.getCodUtilizador()))
-        throw new CodigoJaEstaEmUsoException("Ja existe um registo com este codigo");
+            throw new CodigoJaEstaEmUsoException("Ja existe um registo com este codigo");
         Utilizador p = new Utilizador();
         p.setCodUtilizador(u.getCodUtilizador());
         p.setNome(u.getNome());
@@ -314,7 +320,7 @@ public class Armazena implements Serializable {
      */
     public void novaLoja(Loja l) throws LojaExisteException, CodigoJaEstaEmUsoException{
         if(codEmUso(l.getCodLoja()))
-        throw new CodigoJaEstaEmUsoException("Ja existe um registo com este código");
+            throw new CodigoJaEstaEmUsoException("Ja existe um registo com este código");
         Loja p = new Loja();
         p.setCodLoja(l.getCodLoja());
         p.setNome(l.getNome());
@@ -325,7 +331,7 @@ public class Armazena implements Serializable {
 
     public void novaTransportadora(Transportadora t) throws TransportadoraExisteException, CodigoJaEstaEmUsoException{
         if(this.codEmUso(t.getCodEmpresa()))
-        throw new CodigoJaEstaEmUsoException("Ja existe um registo com este codigo");
+            throw new CodigoJaEstaEmUsoException("Ja existe um registo com este codigo");
         Transportadora p = new Transportadora();
         p.setCodEmpresa(t.getCodEmpresa());
         p.setNome(t.getNome());
@@ -338,7 +344,7 @@ public class Armazena implements Serializable {
 
     public void novoVoluntario(Voluntario v) throws VoluntarioExisteException, CodigoJaEstaEmUsoException{
         if(this.codEmUso(v.getCodVoluntario()))
-        throw new CodigoJaEstaEmUsoException("Ja existe um registo com este codigo");
+            throw new CodigoJaEstaEmUsoException("Ja existe um registo com este codigo");
         Voluntario p = new Voluntario();
         p.setCodVoluntario(v.getCodVoluntario());
         p.setNome(v.getNome());
@@ -408,14 +414,7 @@ public class Armazena implements Serializable {
         return s;
     }
 
-    public void setCatalogos(ArrayList<CatalogoProdutos> produtos){
-        this.produtos=new ArrayList<>(produtos);
-    }
-
-    public ArrayList<CatalogoProdutos> getCatalogos(){
-        return new ArrayList<CatalogoProdutos>(this.produtos);
-    }
-
+    //método para juntar vários catalogos da mesma loja
     public void juntaCatalogos(){
         ArrayList<CatalogoProdutos> cp= new ArrayList<>(this.produtos);
         ArrayList<CatalogoProdutos> res= new ArrayList<>();
@@ -425,21 +424,21 @@ public class Armazena implements Serializable {
             cp.remove(0);
             for(CatalogoProdutos c: cp){
                 if(cat.getCodLoja().equals(c.getCodLoja())){
-                    ArrayList<Produto> p=cat.getProdutos();
-                    p.addAll(c.getProdutos());
-                    cat.setProdutos(p);
-                    check.add(c);
+                        ArrayList<Produto> p=cat.getProdutos();
+                        p.addAll(c.getProdutos());
+                        cat.setProdutos(p);
+                        check.add(c);
+                    }
                 }
-            }
             res.add(cat);
             cp.removeAll(check);
             check=new ArrayList<>();
         }
         setCatalogos(res);
-    }
+   }
 
-    //método que junta produtos com o mesmo código de um catálogoo
-    public void JuntaProdutos(){
+   //método que junta produtos com o mesmo código de um catálogoo
+   public void JuntaProdutos(){
         ArrayList<CatalogoProdutos> cp= new ArrayList<>();
         for(CatalogoProdutos c: this.produtos){
             ArrayList<Produto> pr=new ArrayList<>(c.getProdutos());
@@ -465,28 +464,18 @@ public class Armazena implements Serializable {
             cp.add(c);
         }
         setCatalogos(cp);
-    }
+   }
 
-   /* public Produto converte(LinhaEncomenda l){
-        Produto p = new Produto();
-        p.setCodProd(l.getCodProd());
-        p.setDescricao(l.getDescricao());
-        p.setPreco(l.getPreco());
-        p.setStock(l.getQuantidade());
-        return p;
-    }
-
-    public List<Produto> defaultProdutos(Encomenda e){
-        ArrayList<Produto> produtos= new ArrayList<>();
-        for(LinhaEncomenda l : e.getLinhas() ){
-           produtos.add(converte(l));
+   public boolean checkAceite(Encomenda e){
+        for(String c: this.aceites){
+            if(e.getcodEncomenda().equals(c)){
+                return true;
+            }
         }
-        return produtos;
-    }
+        return false;
+   }
 
-    */
-
-
-
-
+   public void adicionaCodigo(String cod){
+        this.aceites.add(cod);
+   }
 }

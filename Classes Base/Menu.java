@@ -1,10 +1,8 @@
-package trazAqui;
+package trazaqui;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import trazAqui.Exceptions.*;
-
+import trazaqui.Exceptions.*;
 import java.time.format.DateTimeParseException;
 
 public class Menu
@@ -269,6 +267,7 @@ public class Menu
         }
     }
 
+
     /**
      *Lojas por ordem alfabetica
      */
@@ -287,7 +286,6 @@ public class Menu
         }
         throw new CatalogoNaoExisteException();
     }
-
     /**
      * ASSOCIAR CONTA CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO
      */
@@ -326,22 +324,38 @@ public class Menu
         System.out.println("Introduza o seu Password");
         String pass = s.nextLine();
         CatalogoProdutos cp = new CatalogoProdutos();
-        try {
-            cp = buscaCatalogo(cod);
+        HashMap<String,Encomenda> encs=new HashMap<>();
+        for (Encomenda e: a_armazena.getEncomendas().values()){
+            if(e.getcodLoja().equals(cod)){
+                encs.put(e.getcodEncomenda(),e.clone());
+            }
         }
-        catch(CatalogoNaoExisteException e){
+        try{
+            cp=buscaCatalogo(cod);
+        }
+        catch (CatalogoNaoExisteException e){
             System.out.println(e.getMessage());
         }
 
-
         try{
             b_dados.associaLoja(l.getCodLoja(),l.getNome(),l.getGps(),username,pass,cp);
+            for(Encomenda e: encs.values()){
+                if (a_armazena.checkAceite(e)){
+                    b_dados.associaHistorico(e.getcodEncomenda(),e.getcodUtilizador(),e.getcodLoja(),e.getPeso(),e.getLinhas());
+                }
+                else{
+                    b_dados.associaEncomenda(e.getcodEncomenda(),e.getcodUtilizador(),e.getcodLoja(),e.getPeso(),e.getLinhas());
+                }
+            }
         }
 
         catch(LojaExisteException e){
             System.out.println(e.getMessage());
         }
         catch(UsernameJaEstaEmUsoException e){
+            System.out.println(e.getMessage());
+        }
+        catch (EncomendaExisteException e){
             System.out.println(e.getMessage());
         }
     }
@@ -374,7 +388,7 @@ public class Menu
     private void associarContaVoluntario(){
         boolean disponibilidade = true;
         Scanner s = new Scanner(System.in);
-        System.out.println("Introduza o seu Codigo de Voluntario");
+        System.out.println("Introduza o seu Codigo de Voluntário");
         String cod = s.nextLine();
         Voluntario v = a_armazena.getVoluntario(cod);
         System.out.println(v.toString());
@@ -669,8 +683,6 @@ public class Menu
     }
 
 
-
-
     /**
      * MENUS CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO
      */
@@ -722,7 +734,6 @@ public class Menu
                 System.out.println("1 - Consultar Produtos");
                 System.out.println("2 - Consultar dados pessoais");
                 System.out.println("3 - Consultar encomendas");
-
                 System.out.println("0 - Retroceder");
 
                 opcao = s.nextInt();
@@ -736,7 +747,7 @@ public class Menu
                         consultadadosLoja(username);
                         break;
                     case 3:
-                        mudarLocalizacaoLoja(username);
+                        verEncomendas(b_dados.getLojas().get(username).getCodLoja());
                         break;
                     default:
                         System.out.print("Opção inválida\n\n");
@@ -769,7 +780,6 @@ public class Menu
 
                 switch(opcao){
                     case 1:
-
                         break;
                     case 2:
                         consultadadosTransportadora(username);
@@ -807,7 +817,6 @@ public class Menu
 
                 switch(opcao){
                     case 1:
-
                         break;
                     case 2:
                         verLocalizacaoVoluntario(username);
@@ -1147,6 +1156,44 @@ public class Menu
             System.out.println("Entrada inválida");
             menuInicial();
 
+        }
+    }
+
+    //Método que permite uma loja ver as encomendas que lhe foram emitidas
+    public void verEncomendas(String cod){
+        Scanner s = new Scanner(System.in);
+        String opcao = "";
+        try {
+            do {
+                ArrayList<Encomenda> encs=b_dados.buscaEncomendas(cod);
+                if(encs.isEmpty()){
+                    System.out.println("Não existem encomendas!");
+                    break;
+                }
+                else {
+                    System.out.println("Escreva o codigo de encomenda que está pronta a entregar:");
+                    b_dados.buscaEncomendasDisplay(encs);
+                    System.out.println("0 - Retroceder");
+
+                    opcao = s.nextLine();
+                    if(opcao.equals("0")){
+                        break;
+                    }
+                    System.out.print("\n");
+                    for (LogLoja l : b_dados.getLojas().values()) {
+                        if (l.getNome().equals(opcao)) {
+                            System.out.println(l.getCatalogoProdutos().toString());
+                        }
+                    }
+                }
+            }
+            while(true);
+        }
+        catch (LojaNaoExisteException e){
+            System.out.println(e.getMessage());
+        }
+        catch(InputMismatchException e) {
+            System.out.println("Entrada inválida");
         }
     }
 }

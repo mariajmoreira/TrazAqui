@@ -1,14 +1,9 @@
-package trazAqui;
+package trazaqui;
 
-import trazAqui.Exceptions.*;
-import java.util.*;
+import trazaqui.Exceptions.*;
 
-import java.time.LocalDate;
-import java.io.FileNotFoundException;
 import java.io.Serializable;
-import java.io.File;
-import java.time.format.DateTimeFormatter;
-
+import java.util.*;
 
 public class BaseDados implements Serializable {
     private Map <String,LogUtilizador> utilizadores;
@@ -16,6 +11,8 @@ public class BaseDados implements Serializable {
     private Map <String,LogVoluntario> voluntarios;
     private Map <String,LogLoja> lojas;
     private Map <String,Encomenda> encomendas;
+    private Map <String,Encomenda> encomendasdisponiveis;
+    private Map <String,Encomenda> historicoencomendas;
 
     //getters
     public Map<String,LogUtilizador> getUtilizadores(){return new HashMap<>(this.utilizadores);}
@@ -28,6 +25,10 @@ public class BaseDados implements Serializable {
 
     public Map<String, Encomenda> getEncomendas(){return new HashMap<>(this.encomendas);}
 
+    public Map<String, Encomenda> getEncomendasdisponiveis(){return new HashMap<>(this.encomendasdisponiveis);}
+
+    public Map<String, Encomenda> getHistoricoencomendas(){return new HashMap<>(this.historicoencomendas);}
+
     //setters
     public void setUtilizadores(Map<String,LogUtilizador> user){this.utilizadores=new HashMap<>(user);}
 
@@ -39,6 +40,10 @@ public class BaseDados implements Serializable {
 
     public void setEncomendas(Map<String,Encomenda> enc){this.encomendas=new HashMap<>(enc);}
 
+    public void setEncomendasdisponiveis(Map<String,Encomenda> enc){this.encomendasdisponiveis=new HashMap<>(enc);}
+
+    public void setHistoricoencomendas(Map<String,Encomenda> enc){this.historicoencomendas=new HashMap<>(enc);}
+
     //clone
     public BaseDados clone(){return new BaseDados(this);}
 
@@ -49,15 +54,19 @@ public class BaseDados implements Serializable {
         this.voluntarios=new HashMap<>();
         this.lojas=new HashMap<>();
         this.encomendas=new HashMap<>();
+        this.encomendasdisponiveis=new HashMap<>();
+        this.historicoencomendas=new HashMap<>();
     }
 
     //construtor parametrizado
-    public BaseDados(Map<String,LogUtilizador> user,Map<String,LogTransportadora> trans, Map<String,LogVoluntario> vol, Map<String,LogLoja> loj, Map<String,Encomenda> enc){
+    public BaseDados(Map<String,LogUtilizador> user,Map<String,LogTransportadora> trans, Map<String,LogVoluntario> vol, Map<String,LogLoja> loj, Map<String,Encomenda> enc, Map<String,Encomenda> encdisp, Map<String,Encomenda> hist){
         setUtilizadores(user);
         setTransportadoras(trans);
         setVoluntarios(vol);
         setLojas(loj);
         setEncomendas(enc);
+        setEncomendasdisponiveis(encdisp);
+        setHistoricoencomendas(hist);
     }
 
     //construtor por copia
@@ -67,6 +76,8 @@ public class BaseDados implements Serializable {
         setVoluntarios(bd.getVoluntarios());
         setLojas(bd.getLojas());
         setEncomendas(bd.getEncomendas());
+        setEncomendasdisponiveis(bd.getEncomendasdisponiveis());
+        setHistoricoencomendas(bd.getHistoricoencomendas());
     }
 
     //metodo equals
@@ -100,6 +111,10 @@ public class BaseDados implements Serializable {
             if(!this.encomendas.containsValue(e)){
                 return false;
             }
+        }
+        for (Encomenda e: bd.encomendasdisponiveis.values()){
+            if(!this.encomendasdisponiveis.containsValue(e))
+                return false;
         }
 
         return true;
@@ -178,8 +193,9 @@ public class BaseDados implements Serializable {
 
     //lojas
     public boolean ExisteCodLoja(String cod){
-        for(LogTransportadora lt: this.transportadoras.values()){
-            return true;
+        for(LogLoja lt: this.lojas.values()){
+            if(lt.getCodLoja().equals(cod))
+                return true;
         }
         return false;
     }
@@ -187,6 +203,11 @@ public class BaseDados implements Serializable {
     //encomendas
     public boolean ExisteEncomenda(String cod){
         return this.encomendas.containsKey(cod);
+    }
+
+    //historico
+    public boolean ExisteHistorico(String cod){
+        return this.historicoencomendas.containsKey(cod);
     }
 
 
@@ -334,7 +355,7 @@ public class BaseDados implements Serializable {
     }
 
     //encomenda
-    public Encomenda novaEncomenda(String codUtilizador, String codLoja,double peso, ArrayList<LinhaEncomenda> linhas){
+    public Encomenda novaEncomenda(String codUtilizador, String codLoja, double peso, ArrayList<LinhaEncomenda> linhas){
         String cod=novoCodEncomenda();
         Encomenda e= new Encomenda();
         e.setCodEncomenda(cod);
@@ -345,10 +366,32 @@ public class BaseDados implements Serializable {
         this.encomendas.put(e.getcodEncomenda(),e.clone());
         return e;
     }
-    /**
-     * ASSOCIAR CONTA CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO
-     */
 
+    /**
+     * ASSOCIAR CONTA CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO,ENCOMENDA,HISTORICO
+     */
+    public void associaEncomenda(String codEncomenda, String codUtilizador, String codLoja, double peso, ArrayList<LinhaEncomenda> linha) throws EncomendaExisteException{
+        if(ExisteEncomenda(codEncomenda))
+            throw new EncomendaExisteException("Já existe um registo com este código de encomenda");
+        Encomenda e= new Encomenda();
+        e.setCodEncomenda(codEncomenda);
+        e.setCodUtilizador(codUtilizador);
+        e.setCodLoja(codLoja);
+        e.setPeso(peso);
+        e.setLinhas(linha);
+        this.encomendas.put(e.getcodEncomenda(),e.clone());
+    }
+    public void associaHistorico(String codEncomenda, String codUtilizador, String codLoja, double peso, ArrayList<LinhaEncomenda> linha)throws EncomendaExisteException{
+       if(ExisteHistorico(codEncomenda))
+           throw new EncomendaExisteException("Já existe um registo com este código de encomenda");
+       Encomenda e=new Encomenda();
+       e.setCodEncomenda(codEncomenda);
+       e.setCodUtilizador(codUtilizador);
+       e.setCodLoja(codLoja);
+       e.setPeso(peso);
+       e.setLinhas(linha);
+       this.historicoencomendas.put(e.getcodEncomenda(),e.clone());
+    }
     public void associaLoja(String cod, String nome, Localizacao gps, String user, String pass, CatalogoProdutos cp) throws LojaExisteException,UsernameJaEstaEmUsoException {
         if (userEmUso(user))
             throw new UsernameJaEstaEmUsoException("Já existe um registo com este username");
@@ -718,5 +761,26 @@ public class BaseDados implements Serializable {
             s.add(a.getNome());
         }
         return s;
+    }
+
+    //Método que retorna uma lista de encomendas recebida por uma loja
+    public ArrayList<Encomenda> buscaEncomendas(String cod) throws LojaNaoExisteException {
+        if (!ExisteCodLoja(cod))
+            throw new LojaNaoExisteException("Esta Loja Não Existe!");
+        ArrayList<Encomenda> e = new ArrayList<>();
+
+        for(Encomenda enc: this.encomendas.values()){
+            if(enc.getcodLoja().equals(cod)){
+                e.add(enc);
+            }
+        }
+        return e;
+    }
+
+    //Método imprime as encomendas que uma loja recebeu
+    public void buscaEncomendasDisplay(ArrayList<Encomenda> enc){
+        for (Encomenda encomenda : enc) {
+            System.out.println(encomenda);
+        }
     }
 }

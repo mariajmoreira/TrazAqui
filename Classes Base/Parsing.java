@@ -1,6 +1,6 @@
-package trazAqui;
+package trazaqui;
 
-import trazAqui.Exceptions.*;
+import trazaqui.Exceptions.*;
 
 import java.util.List;
 import java.util.*;
@@ -45,6 +45,11 @@ public class Parsing {
                     a_armazena.novaEncomenda(e);
                     a_armazena.novoCatalogoProdutos(c);
                     System.out.println(e.toString()); //enviar para o ecrÃ¡n apenas para teste
+                    break;
+                case "Aceite":
+                    String cod=linhaPartida[1];
+                    a_armazena.adicionaCodigo(cod);
+                    System.out.println("Aceite:"+cod);
                     break;
                 default:
                     System.out.println("Linha invÃ¡lida.");
@@ -116,7 +121,6 @@ public class Parsing {
 
     public CatalogoProdutos parseCatalogo(String input){
         String[] campos = input.split(",");
-        String codLoja = campos[2];
         String[] tralhas= tralha(campos);
         ArrayList<Produto> l= new ArrayList<>();
         for(int i=0; i<tralhas.length;i+=4){
@@ -124,7 +128,7 @@ public class Parsing {
             Produto p = parseProduto(tralhas,i);
             l.add(p);
         }
-        return new CatalogoProdutos(codLoja,l);
+        return new CatalogoProdutos(campos[2],l);
     }
 
     public LinhaEncomenda parseLinhaEncomenda(String[] campos, int i){
@@ -160,14 +164,4 @@ public class Parsing {
     public Parsing(Armazena armazena) throws UtilizadorExisteException, VoluntarioExisteException, LojaExisteException, TransportadoraExisteException, CodigoJaEstaEmUsoException, EncomendaExisteException {
         parse(armazena);
     }
-/*
-    public static void main(String[] args) throws UtilizadorExisteException, VoluntarioExisteException, LojaExisteException, TransportadoraExisteException, CodigoJaEstaEmUsoException {
-        Armazena a = new Armazena();
-        Parsing p = new Parsing(a);
-        p.parse();
-        String cod="u40";
-        System.out.println(a.getUtilizadores());
-
-    }
-*/
 }
