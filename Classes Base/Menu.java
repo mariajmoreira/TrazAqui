@@ -151,7 +151,7 @@ public class Menu
         try {
             String opcao;
             do {
-                System.out.println("1 -Adicionar um produto ao carrinho");
+                System.out.println("1 - Adicionar um produto ao carrinho");
                 System.out.println("2 - Remover um produto do carrinho");
                 System.out.println("3 - Efetuar encomenda");
                 System.out.println("0 - Retroceder");
@@ -180,6 +180,35 @@ public class Menu
                         System.out.print("\n");
                         break;
                     case "2":
+                        System.out.println("Introduza o código do produto!");
+                        opcao = s.nextLine();
+                        System.out.print(opcao);
+                        System.out.print("\n");
+                        System.out.println("Indique a quantidade");
+                        double qu = Double.parseDouble(s.nextLine());
+                        int index =0;
+                        for(LinhaEncomenda le : encs) {
+                            if (le.getCodProd().equals(opcao)) {
+                                if(le.getQuantidade()==qu){
+                                    break;
+                                }else{
+                                    le.setQuantidade(le.getQuantidade()-qu);
+                                    le.setPreco(calculaPreco(le.getPreco(),le.getQuantidade(),qu));
+                                    index=-1;
+                                    break;
+                                }
+                            }
+                            else{
+                                System.out.print("O produto não se encontra no seu carrinho!\n");
+                            }
+                            index+=1;
+                        }
+
+                        if(index!=-1){
+                            encs.remove(index);
+                        }
+                        System.out.println(encs);
+                        break;
 
                     case "3":
                         double peso = calculaPeso(encs);
@@ -187,15 +216,17 @@ public class Menu
                         System.out.print("Encomenda efetuada com sucesso!\n");
                         System.out.print("Codigo da sua Encomenda:" + e.getcodEncomenda());
                         System.out.print("\n");
+                        break;
                     case "0":
                         menuCliente(codUtilizador);
+                        break;
                     default:
                         System.out.print("Opção inválida\n\n");
                         break;
 
                 }
             }
-            while (!opcao.equals("0") || !opcao.equals("2"));
+            while (true);
         }
         catch(CatalogoNaoExisteException e) {
             System.out.println("Nao existe catalogo");
