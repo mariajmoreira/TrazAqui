@@ -168,6 +168,11 @@ public class BaseDados implements Serializable {
         this.lojas.put(loj.getUsername(),loj.clone());
     }
 
+    //à lista de encomendas disponiveis
+    public void addEncomendaDisponivel(Encomenda enc) {this.encomendasdisponiveis.put(enc.getcodEncomenda(),enc.clone());}
+
+    //método que remove uma encomenda da lista de encomendas
+    public void removeEncomenda(Encomenda enc){this.encomendas.remove(enc.getcodEncomenda(), enc.clone());}
 
     //metodo que verifica se um determinado user existe
     //utilizadores
