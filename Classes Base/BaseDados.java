@@ -16,6 +16,7 @@ public class BaseDados implements Serializable {
     private Map <String,Historico> historico;
     private ArrayList<Historico> entregas;
     private ArrayList<Pair<String,String>> flags;
+    private ArrayList<String> classifica;
 
     //getters
     public Map<String,LogUtilizador> getUtilizadores(){return new HashMap<>(this.utilizadores);}
@@ -36,6 +37,8 @@ public class BaseDados implements Serializable {
 
     public ArrayList<Pair<String,String>> getFlags(){return new ArrayList<>(this.flags);}
 
+    public ArrayList<String> getClassifica(){return new ArrayList<>(this.classifica);}
+
     //setters
     public void setUtilizadores(Map<String,LogUtilizador> user){this.utilizadores=new HashMap<>(user);}
 
@@ -54,6 +57,8 @@ public class BaseDados implements Serializable {
     public void setEntregas(ArrayList<Historico> ent){this.entregas=new ArrayList<>(ent);}
 
     public void setFlags(ArrayList<Pair<String,String>> f){this.flags=new ArrayList<>(f);}
+
+    public void setClassifica(ArrayList<String> c){this.classifica=new ArrayList<>(c);}
     //clone
     public BaseDados clone(){return new BaseDados(this);}
 
@@ -68,10 +73,11 @@ public class BaseDados implements Serializable {
         this.historico=new HashMap<>();
         this.entregas=new ArrayList<>();
         this.flags=new ArrayList<>();
+        this.classifica=new ArrayList<>();
     }
 
     //construtor parametrizado
-    public BaseDados(Map<String,LogUtilizador> user,Map<String,LogTransportadora> trans, Map<String,LogVoluntario> vol, Map<String,LogLoja> loj, Map<String,Encomenda> enc, Map<String,Encomenda> encdisp, Map<String,Historico> hist, ArrayList<Historico> ent, ArrayList<Pair<String,String>> f){
+    public BaseDados(Map<String,LogUtilizador> user,Map<String,LogTransportadora> trans, Map<String,LogVoluntario> vol, Map<String,LogLoja> loj, Map<String,Encomenda> enc, Map<String,Encomenda> encdisp, Map<String,Historico> hist, ArrayList<Historico> ent, ArrayList<Pair<String,String>> f,ArrayList<String> c){
         setUtilizadores(user);
         setTransportadoras(trans);
         setVoluntarios(vol);
@@ -81,6 +87,7 @@ public class BaseDados implements Serializable {
         setHistorico(hist);
         setEntregas(ent);
         setFlags(f);
+        setClassifica(c);
     }
 
     //construtor por copia
@@ -168,8 +175,14 @@ public class BaseDados implements Serializable {
         this.lojas.put(loj.getUsername(),loj.clone());
     }
 
-    //à lista de encomendas disponiveis
+    //adiciona uma encomenda à lista de encomendas disponiveis
     public void addEncomendaDisponivel(Encomenda enc) {this.encomendasdisponiveis.put(enc.getcodEncomenda(),enc.clone());}
+
+    //adiciona uma encomenda para uma transportadora no à lista de flags
+    public void addFlag(String codTrans, String codEncomenda){this.flags.add(new Pair<>(codTrans,codEncomenda));}
+
+    //adiciona um codigo encomenda
+    public void addClassifica(String cod){this.classifica.add(cod);}
 
     //método que remove uma encomenda da lista de encomendas
     public void removeEncomenda(Encomenda enc){this.encomendas.remove(enc.getcodEncomenda(), enc.clone());}
@@ -243,6 +256,15 @@ public class BaseDados implements Serializable {
 
     //historico
     public boolean ExisteHistorico(String cod){return this.historico.containsKey(cod);}
+
+    //
+    public boolean ExisteEntrega(String cod){
+        for(Historico h: this.entregas){
+            if (h.getcodEncomenda().equals(cod))
+                return true;
+        }
+        return false;
+    }
 
 
     //método que verifica
@@ -557,6 +579,10 @@ public class BaseDados implements Serializable {
             cod=h.getcodEncomenda().substring(1);
             if(Integer.parseInt(cod)>count) count=Integer.parseInt(cod);
         }
+        for(Historico h: this.entregas){
+            cod=h.getcodEncomenda().substring(1);
+            if(Integer.parseInt(cod)>count) count=Integer.parseInt(cod);
+        }
         Random rand=new Random();
         String confirma="e"+count;
         while(ExisteEncomenda(confirma)||ExisteAceite(confirma)||ExisteHistorico(confirma)){
@@ -698,45 +724,53 @@ public class BaseDados implements Serializable {
 
     //método que adicona uma classificação
     //a uma transportadora
-    public void classifTrans(String user, Classificacao classif) throws TransportadoraNaoExisteException{
-        if(!ExisteTransportadora(user))
+    public void classifTrans(String cod, Classificacao classif) throws TransportadoraNaoExisteException{
+        if(!ExisteCodTrans(cod))
             throw new TransportadoraNaoExisteException("A empresa transportadora não existe!");
-        List<Classificacao> cl= this.transportadoras.get(user).getClassificacoes();
+        ArrayList<Classificacao> cl= getTrans(cod).getClassificacoes();
         cl.add(classif);
+        getTrans(cod).setClassificacoes(cl);
     }
 
     //a um voluntario
-    public void classifVol(String user, Classificacao classif) throws VoluntarioNaoExisteException{
-        if(!ExisteVoluntario(user))
+    public void classifVol(String cod, Classificacao classif) throws VoluntarioNaoExisteException{
+        if(!ExisteCodVoluntario(cod))
             throw new VoluntarioNaoExisteException("O voluntário não existe!");
-        List<Classificacao> cl= this.voluntarios.get(user).getClassificacoes();
+        ArrayList<Classificacao> cl= getVoluntario(cod).getClassificacoes();
         cl.add(classif);
+        getTrans(cod).setClassificacoes(cl);
     }
 
     //método que determina a classificacao média
     //das transportadoras
-    public double classifMediaTrans(String user) throws TransportadoraNaoExisteException{
-        if(!ExisteTransportadora(user))
-            throw new TransportadoraNaoExisteException("A empresa transportadora não existe!");
+    public void classifMediaTrans(String user){
         List<Classificacao> cl =this.transportadoras.get(user).getClassificacoes();
-        double count=0;
-        for(Classificacao c: cl){
-            count+=c.getClassificacao();
+        if (cl.isEmpty()){
+            System.out.println("Esta transportadora ainda não recebeu nenhuma classificação");
+        }
+        else {
+            double count = 0;
+            for (Classificacao c : cl) {
+                count += c.getClassificacao();
+            }
+            System.out.println(count/cl.size());
         }
 
-        return count/cl.size();
     }
 
     //dos voluntarios
-    public double classifMediaVol(String user) throws VoluntarioNaoExisteException{
-        if(!ExisteVoluntario(user))
-            throw new VoluntarioNaoExisteException("O voluntario não existe!");
+    public void classifMediaVol(String user){
         List<Classificacao> cl=this.voluntarios.get(user).getClassificacoes();
-        double count=0;
-        for(Classificacao c: cl){
-            count+=c.getClassificacao();
+        if (cl.isEmpty())
+            System.out.println("Este voluntário ainda não foi classificado");
+        else {
+            double count = 0;
+            for (Classificacao c : cl) {
+                count += c.getClassificacao();
+            }
+            System.out.println(count/cl.size());
         }
-        return count/cl.size();
+
     }
 
     //método para uma loja poder alterar o preço de um produto
@@ -928,6 +962,22 @@ public class BaseDados implements Serializable {
         return null;
     }
 
+    //método para devolver uma transportadora através do seu código
+    public LogTransportadora getTrans(String cod){
+        for(LogTransportadora c : this.transportadoras.values()){
+            if(c.getCodEmpresa().equals(cod))
+                return c;        }
+        return null;
+    }
+
+    //método para devolver um voluntário através do seu código
+    public LogVoluntario getVoluntario(String cod){
+        for(LogVoluntario c : this.voluntarios.values()){
+            if(c.getCodVoluntario().equals(cod))
+                return c;        }
+        return null;
+    }
+
     //método que devolve uma lista de encomendas disponiveis para um empresa transportadora entregar
     public ArrayList<Encomenda> buscaEncomendasTransportadora(String username){
         Transportadora t=this.transportadoras.get(username);
@@ -949,4 +999,84 @@ public class BaseDados implements Serializable {
         return encs;
     }
 
+    //método que busca todas as transportadoras cujo o raio alcança o cliente e a loja em questão
+    public ArrayList<LogTransportadora> buscatransportadoras(String codutilizador, String codloja) {
+        ArrayList<LogTransportadora> lt= new ArrayList<>();
+        for(LogTransportadora t: this.transportadoras.values()){
+            if((t.getGps().distLocalizacao(getUtilizador(codutilizador).getGps())<t.getRaio()) && (t.getGps().distLocalizacao(getLoja(codloja).getGps())<t.getRaio())){
+                lt.add(t);
+            }
+        }
+        return lt;
+    }
+
+    //método que dá display das transportadoras
+    public void transportadoraDisplay(ArrayList<LogTransportadora> lt){
+        for(LogTransportadora t: lt){
+            System.out.println(t.getCodEmpresa());
+            System.out.println(t.getNome());
+            System.out.println(t.getPrecokm());
+            classifMediaTrans(t.getUsername());
+            System.out.print("\n");
+        }
+    }
+
+    //método que printa o estado de uma encomenda
+    public void estadodeEncomenda(String codEncomenda) throws EncomendaNaoExisteException{
+        if(!ExisteEncomenda(codEncomenda) && !ExisteAceite(codEncomenda) && !ExisteHistorico(codEncomenda) && !ExisteEntrega(codEncomenda))
+            throw new EncomendaNaoExisteException("Não existe nenhuma encomenda com este registo");
+        for(Encomenda e: this.encomendas.values()){
+            if (e.getcodEncomenda().equals(codEncomenda)) {
+                System.out.println("A encomenda " + codEncomenda + " ainda não foi aceite");
+                break;
+            }
+        }
+        for(Encomenda e: this.encomendasdisponiveis.values()){
+            int c=0;
+            if(e.getcodEncomenda().equals(codEncomenda)) {
+                for (Pair<String, String> p : this.flags) {
+                    if (p.getValue1().equals(codEncomenda)) {
+                        System.out.println("A encomenda " + codEncomenda + " está a espera pela transportadora " + p.getValue0());
+                        c=1;
+                    }
+                }
+                if (c==0){
+                    System.out.println("A encomenda " + codEncomenda + " está a espera por ser aceite por um voluntário");
+                }
+            }
+        }
+        for(Historico h: this.entregas){
+            if(h.getcodEncomenda().equals(codEncomenda)){
+                if(h.getCod().charAt(0)=='v')
+                    System.out.println("A encomenda "+ codEncomenda + " está em caminho pelo voluntário "+ h.getCod());
+                else if (h.getCod().charAt(0)=='t')
+                    System.out.println("A encomenda"+ codEncomenda +" está em caminho pela transportadora "+ h.getCod());
+            }
+        }
+        for(Historico h: this.historico.values()){
+            if(h.getcodEncomenda().equals(codEncomenda)){
+                System.out.println("A encomenda "+ codEncomenda + "já foi entregue");
+            }
+        }
+    }
+
+    //método que vai buscar todas as transportadoras e voluntários associados a um cliente que ainda não foram classificados
+    public ArrayList<String> buscapraClassificar(String username){
+        ArrayList<String> encs=new ArrayList<>();
+        for(String cod: this.classifica){
+            if(this.historico.get(cod).getcodUtilizador().equals(this.utilizadores.get(username).getCodUtilizador())){
+                encs.add(cod);
+            }
+        }
+        return encs;
+    }
+
+    //método para dar display das transportadoras e voluntários que fizeram uma entrega e ainda não foram calssificados
+    public void displaypraClassificar(ArrayList<String> encs){
+        for(String s: encs){
+            System.out.println(this.historico.get(s).getCod());
+            System.out.println(this.historico.get(s).getNome());
+            System.out.println(s);
+        }
+    }
 }
