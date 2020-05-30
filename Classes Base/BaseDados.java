@@ -4,6 +4,7 @@ import trazaqui.Exceptions.*;
 import org.javatuples.Pair;
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -187,6 +188,9 @@ public class BaseDados implements Serializable {
 
     //método que remove uma encomenda da lista de encomendas
     public void removeEncomenda(Encomenda enc){this.encomendas.remove(enc.getcodEncomenda(), enc.clone());}
+
+    //método que remove uma encomenda da lista de encomendas disponiveis
+    public void removeEncomendaDisponivel(Encomenda enc){this.encomendasdisponiveis.remove(enc.getcodEncomenda(),enc.clone());}
 
     //metodo que verifica se um determinado user existe
     //utilizadores
@@ -422,6 +426,19 @@ public class BaseDados implements Serializable {
         e.setLinhas(linhas);
         this.encomendas.put(e.getcodEncomenda(),e.clone());
         return e;
+    }
+
+    //histórico
+    public void novaEntrega(String cod, String nome,String codEncomenda,String codUtilizador, String codLoja, double peso, ArrayList<LinhaEncomenda> linhas){
+        Historico h= new Historico();
+        h.setCod(cod);
+        h.setNome(nome);
+        h.setCodEncomenda(codEncomenda);
+        h.setCodUtilizador(codUtilizador);
+        h.setCodLoja(codLoja);
+        h.setPeso(peso);
+        h.setLinhas(linhas);
+        this.entregas.add(h.clone());
     }
 
     /**
@@ -928,24 +945,6 @@ public class BaseDados implements Serializable {
         }
     }
 
-    //método que retorna uma lista de encomendas disponiveis para um voluntário entregar
-    public ArrayList<Encomenda> buscaEncomendasVoluntario(String username){
-        ArrayList<Encomenda> encs=new ArrayList<>();
-        ArrayList<String> cods=new ArrayList<>();
-        Voluntario v=this.voluntarios.get(username);
-        for(Pair<String,String> flag: this.flags){
-            cods.add(flag.getValue1());
-        }
-
-        for(Encomenda e:this.encomendasdisponiveis.values()){
-            LogLoja l= getLoja(e.getcodLoja());
-            LogUtilizador u= getUtilizador(e.getcodUtilizador());
-            if( (!cods.contains(e.getcodEncomenda())) && (v.getGps().distLocalizacao(l.getGps())<v.getRaio()) && (v.getGps().distLocalizacao(u.getGps())<v.getRaio()) )
-                encs.add(e);
-        }
-
-        return encs;
-    }
     //método para devolver um utilizador através do seu código
     public LogUtilizador getUtilizador(String cod){
         for(LogUtilizador c : this.utilizadores.values()){
@@ -982,27 +981,6 @@ public class BaseDados implements Serializable {
         return null;
     }
 
-    //método que devolve uma lista de encomendas disponiveis para um empresa transportadora entregar
-    public ArrayList<Encomenda> buscaEncomendasTransportadora(String username){
-        Transportadora t=this.transportadoras.get(username);
-        ArrayList<Encomenda> encs=new ArrayList<>();
-        ArrayList<String> cods=new ArrayList<>();
-
-        for(Pair<String,String> flag: this.flags){
-            if(t.getCodEmpresa().equals(flag.getValue0()))
-                cods.add(flag.getValue1());
-        }
-
-        for(Encomenda e:this.encomendasdisponiveis.values()){
-            LogLoja l=getLoja(e.getcodLoja());
-            LogUtilizador u=getUtilizador(e.getcodUtilizador());
-            if((cods.contains(e.getcodEncomenda())) && (t.getGps().distLocalizacao(u.getGps())<t.getRaio()) && (t.getGps().distLocalizacao(l.getGps())<t.getRaio()))
-                encs.add(e);
-        }
-
-        return encs;
-    }
-
     //método que busca todas as transportadoras cujo o raio alcança o cliente e a loja em questão
     public ArrayList<LogTransportadora> buscatransportadoras(String codutilizador, String codloja) {
         ArrayList<LogTransportadora> lt= new ArrayList<>();
@@ -1020,7 +998,6 @@ public class BaseDados implements Serializable {
             System.out.println(t.getCodEmpresa());
             System.out.println(t.getNome());
             System.out.println(t.getPrecokm()+"€/km");
-            System.out.println(t.getClassificacoes());
             classifMediaTrans(t);
             System.out.print("\n");
         }
@@ -1052,10 +1029,30 @@ public class BaseDados implements Serializable {
         }
         for(Historico h: this.entregas){
             if(h.getcodEncomenda().equals(codEncomenda)){
-                if(h.getCod().charAt(0)=='v')
-                    System.out.println("A encomenda "+ codEncomenda + " está em caminho pelo voluntário "+ h.getCod());
-                else if (h.getCod().charAt(0)=='t')
-                    System.out.println("A encomenda"+ codEncomenda +" está em caminho pela transportadora "+ h.getCod());
+                if(h.getCod().charAt(0)=='v') {
+                    System.out.println("A encomenda " + codEncomenda + " está em caminho pelo voluntário " + h.getCod());
+                    LocalDateTime date=h.getDate();
+                    Pair<Integer,Integer> p=calculaTempoVol(h.getCod(),h.getcodLoja(),h.getcodUtilizador());
+                    int horas=p.getValue0();
+                    int min=p.getValue1();
+                    System.out.println("O voluntário foi buscar a sua encomenda às: " +date);
+                    System.out.println("O tempo de espera estimado é: "+horas+"horas e"+min+"minutos");
+                    System.out.println("Entrega prevista pras: " +LocalDateTime.of(date.getYear(),date.getMonth(),date.getDayOfMonth(),date.getHour()+horas,date.getMinute()+min));
+                }
+                else if (h.getCod().charAt(0)=='t') {
+                    System.out.println("A encomenda " + codEncomenda + " está em caminho pela transportadora " + h.getCod());
+                    LocalDateTime date=h.getDate();
+                    System.out.println("teste1");
+                    Pair<Integer,Integer> p=calculaTempoTrans(h.getCod(),h.getcodLoja(),h.getcodUtilizador());
+                    System.out.println("teste2");
+                    int horas=p.getValue0();
+                    int min=p.getValue1();
+                    System.out.println("A empresa enviou um estafeta às: " +date.getHour()+":"+date.getMinute());
+                    System.out.println("O tempo de espera estimado é: "+horas+" horas e "+min+" minutos");
+                    LocalDateTime prevista=date.plusHours(horas);
+                    prevista=prevista.plusMinutes(min);
+                    System.out.println("Entrega prevista pras: " +prevista.getHour()+":"+prevista.getMinute()+" do dia "+prevista.getDayOfMonth());
+                }
             }
         }
         for(Historico h: this.historico.values()){
@@ -1083,5 +1080,91 @@ public class BaseDados implements Serializable {
             System.out.println(this.historico.get(s).getNome());
             System.out.println(s);
         }
+    }
+
+    //método que retorna uma lista de encomendas disponiveis para um voluntário entregar
+    public ArrayList<Encomenda> buscaEncomendasVoluntario(String username){
+        ArrayList<Encomenda> encs=new ArrayList<>();
+        ArrayList<String> cods=new ArrayList<>();
+        Voluntario v=this.voluntarios.get(username);
+        for(Pair<String,String> flag: this.flags){
+            cods.add(flag.getValue1());
+        }
+
+        for(Encomenda e:this.encomendasdisponiveis.values()){
+            LogLoja l= getLoja(e.getcodLoja());
+            LogUtilizador u= getUtilizador(e.getcodUtilizador());
+            if( (!cods.contains(e.getcodEncomenda())) && (v.getGps().distLocalizacao(l.getGps())<v.getRaio()) && (v.getGps().distLocalizacao(u.getGps())<v.getRaio()) )
+                encs.add(e);
+        }
+
+        return encs;
+    }
+
+    //método que devolve uma lista de encomendas disponiveis para um empresa transportadora entregar
+    public ArrayList<Encomenda> buscaEncomendasTransportadora(String username){
+        Transportadora t=this.transportadoras.get(username);
+        ArrayList<Encomenda> encs=new ArrayList<>();
+        ArrayList<String> cods=new ArrayList<>();
+
+        for(Pair<String,String> flag: this.flags){
+            if(t.getCodEmpresa().equals(flag.getValue0()))
+                cods.add(flag.getValue1());
+        }
+
+        for(Encomenda e:this.encomendasdisponiveis.values()){
+            LogLoja l=getLoja(e.getcodLoja());
+            LogUtilizador u=getUtilizador(e.getcodUtilizador());
+            if((cods.contains(e.getcodEncomenda())) && (t.getGps().distLocalizacao(u.getGps())<t.getRaio()) && (t.getGps().distLocalizacao(l.getGps())<t.getRaio()))
+                encs.add(e);
+        }
+
+        return encs;
+    }
+
+    //metodo para calcular o tempo estimado de entrega feita por voluntario
+    public Pair<Integer,Integer> calculaTempoVol(String codVoluntario, String codLoja, String codUtilizador){
+        int horas =0;
+        int minutos = 0;
+        double velocidade = 50;
+        double distVoluntarioLoja = getVoluntario(codVoluntario).getGps().distLocalizacao(getLoja(codLoja).getGps());
+        double distLojaCliente = getLoja(codLoja).getGps().distLocalizacao(getUtilizador(codUtilizador).getGps());
+        double distanciaTotal = distLojaCliente + distVoluntarioLoja;
+        double tempo = distanciaTotal/velocidade;
+        while(tempo!=0) {
+            if (tempo > 1) {
+                tempo -= 1;
+                horas += 1;
+            }
+            else{
+                minutos += (int) (tempo *60);
+                tempo-=tempo;
+            }
+        }
+        Pair<Integer,Integer> p = new Pair<>(horas,minutos);
+        return p;
+    }
+
+    //metodo para calcular o tempo estimado de entrega feita por transportadora
+    public Pair<Integer,Integer> calculaTempoTrans(String codTransportadora, String codLoja, String codUtilizador){
+        int horas =0;
+        int minutos = 0;
+        double velocidade = 50;
+        double distTransLoja = getTrans(codTransportadora).getGps().distLocalizacao(getLoja(codLoja).getGps());
+        double distLojaCliente = getLoja(codLoja).getGps().distLocalizacao(getUtilizador(codUtilizador).getGps());
+        double distanciaTotal = distLojaCliente + distTransLoja;
+        double tempo = distanciaTotal/velocidade;
+        while(tempo!=0) {
+            if (tempo > 1) {
+                tempo -= 1;
+                horas += 1;
+            }
+            else{
+                minutos += (int) (tempo *60);
+                tempo-=tempo;
+            }
+        }
+        Pair<Integer,Integer> p = new Pair<>(horas,minutos);
+        return p;
     }
 }

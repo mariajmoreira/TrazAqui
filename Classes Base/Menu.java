@@ -734,8 +734,7 @@ public class Menu
                 System.out.println("1 - Ver Lojas");
                 System.out.println("2 - Consultar Dados Pessoais");
                 System.out.println("3 - Historico de Encomendas");
-                System.out.println("4 - Classifica um voluntário/transportadora");
-                System.out.println("5 - Ver estado de encomenda");
+                System.out.println("4 - Ver estado de encomenda");
 
 
                 System.out.println("0 - Retroceder");
@@ -754,8 +753,6 @@ public class Menu
                         b_dados.buscaHistoricoDisplay(b_dados.buscaHistoricoUtilizador(b_dados.getUtilizadores().get(username).getCodUtilizador()));
                         break;
                     case 4:
-                        break;
-                    case 5:
                         EstadoEncomenda();
                         break;
                     default:
@@ -837,6 +834,7 @@ public class Menu
 
                 switch(opcao){
                     case 1:
+                        menuEncomendasTrans(username);
                         break;
                     case 2:
                         consultadadosTransportadora(username);
@@ -878,6 +876,7 @@ public class Menu
 
                 switch(opcao){
                     case 1:
+                        menuEncomendasVol(username);
                         break;
                     case 2:
                         b_dados.buscaHistoricoDisplay(b_dados.buscaHistoricoVoluntario(b_dados.getVoluntarios().get(username).getCodVoluntario()));
@@ -1328,6 +1327,7 @@ public class Menu
                             System.out.print("\n");
                             i=1;
                         }
+                        break;
                     case "2":
                         System.out.println("Pedido efetuado com sucesso");
                         System.out.print("Encomenda efetuada com sucesso!\n");
@@ -1379,100 +1379,68 @@ public class Menu
                     System.out.println("4 - ★★★★");
                     System.out.println("5 - ★★★★★");
                     String op=s.nextLine();
-                    if(opcao.charAt(0)=='t'){
-                        int i=0;
-                        while(i==0) {
-                            try{
-                                switch (op) {
-                                    case "1": {
-                                        Classificacao c = new Classificacao(1.0);
+                    int i=0;
+                    while(i==0) {
+                        try{
+                            switch (op) {
+                                case "1": {
+                                    Classificacao c = new Classificacao(1.0);
+                                    if(opcao.charAt(0)=='t')
                                         b_dados.classifTrans(opcao, c);
-                                        i=1;
-                                        break;
-                                    }
-                                    case "2": {
-                                        Classificacao c = new Classificacao(2.0);
-                                        b_dados.classifTrans(opcao, c);
-                                        i=1;
-                                        break;
-                                    }
-                                    case "3": {
-                                        Classificacao c = new Classificacao(3.0);
-                                        b_dados.classifTrans(opcao, c);
-                                        i=1;
-                                        break;
-                                    }
-                                    case "4": {
-                                        Classificacao c = new Classificacao(4.0);
-                                        b_dados.classifTrans(opcao, c);
-                                        i=1;
-                                        break;
-                                    }
-                                    case "5": {
-                                        Classificacao c = new Classificacao(5.0);
-                                        b_dados.classifTrans(opcao, c);
-                                        i=1;
-                                        break;
-                                    }
-                                    default:
-                                        System.out.println("Opção Invávlida!");
-                                        break;
+                                    else if(opcao.charAt(0)=='v')
+                                        b_dados.classifVol(opcao,c);
+                                    i=1;
+                                    break;
                                 }
-                            }
-                            catch (TransportadoraNaoExisteException e){
-                                System.out.println(e.getMessage());
-                            }
-                            catch (InputMismatchException e){
-                                System.out.println(e.getMessage());
+                                case "2": {
+                                    Classificacao c = new Classificacao(2.0);
+                                    if(opcao.charAt(0)=='t')
+                                        b_dados.classifTrans(opcao, c);
+                                    else if(opcao.charAt(0)=='v')
+                                        b_dados.classifVol(opcao,c);
+                                    i=1;
+                                    break;
+                                }
+                                case "3": {
+                                    Classificacao c = new Classificacao(3.0);
+                                    if(opcao.charAt(0)=='t')
+                                        b_dados.classifTrans(opcao, c);
+                                    else if(opcao.charAt(0)=='v')
+                                        b_dados.classifVol(opcao,c);
+                                    i=1;
+                                    break;
+                                }
+                                case "4": {
+                                    Classificacao c = new Classificacao(4.0);
+                                    if(opcao.charAt(0)=='t')
+                                        b_dados.classifTrans(opcao, c);
+                                    else if(opcao.charAt(0)=='v')
+                                        b_dados.classifVol(opcao,c);
+                                    i=1;
+                                    break;
+                                }
+                                case "5": {
+                                    Classificacao c = new Classificacao(5.0);
+                                    if(opcao.charAt(0)=='t')
+                                        b_dados.classifTrans(opcao, c);
+                                    else if(opcao.charAt(0)=='v')
+                                        b_dados.classifVol(opcao,c);
+                                    i=1;
+                                    break;
+                                }
+                                default:
+                                    System.out.println("Opção Invávlida!");
+                                    break;
                             }
                         }
-                    }
-                    else if(opcao.charAt(0)=='v'){
-                        int i=0;
-                        while(i==0) {
-                            try{
-                                switch (op) {
-                                    case "1": {
-                                        Classificacao c = new Classificacao(1.0);
-                                        b_dados.classifVol(opcao, c);
-                                        i=1;
-                                        break;
-                                    }
-                                    case "2": {
-                                        Classificacao c = new Classificacao(2.0);
-                                        b_dados.classifVol(opcao, c);
-                                        i=1;
-                                        break;
-                                    }
-                                    case "3": {
-                                        Classificacao c = new Classificacao(3.0);
-                                        b_dados.classifVol(opcao, c);
-                                        i=1;
-                                        break;
-                                    }
-                                    case "4": {
-                                        Classificacao c = new Classificacao(4.0);
-                                        b_dados.classifVol(opcao, c);
-                                        i=1;
-                                        break;
-                                    }
-                                    case "5": {
-                                        Classificacao c = new Classificacao(5.0);
-                                        b_dados.classifVol(opcao, c);
-                                        i=1;
-                                        break;
-                                    }
-                                    default:
-                                        System.out.println("Opção Invávlida!");
-                                        break;
-                                }
-                            }
-                            catch (VoluntarioNaoExisteException e){
-                                System.out.println(e.getMessage());
-                            }
-                            catch (InputMismatchException e){
-                                System.out.println(e.getMessage());
-                            }
+                        catch (TransportadoraNaoExisteException e){
+                            System.out.println(e.getMessage());
+                        }
+                        catch (VoluntarioNaoExisteException e){
+                            System.out.println(e.getMessage());
+                        }
+                        catch (InputMismatchException e){
+                            System.out.println(e.getMessage());
                         }
                     }
                 }
@@ -1480,5 +1448,70 @@ public class Menu
         }while(true);
 
 
+    }
+
+
+    public void menuEncomendasVol(String username){
+        ArrayList<Encomenda> encs=b_dados.buscaEncomendasVoluntario(username);
+        if(encs.isEmpty()){
+            System.out.println("Não existem encomendas disponiveis na sua localização");
+        }
+        else{
+            Scanner s=new Scanner(System.in);
+            b_dados.buscaEncomendasDisplay(encs);
+            int check=0;
+            while(check==0) {
+                System.out.println("Digite o código de encomenda que escolheu entregar");
+                System.out.println("0 - Retroceder");
+                String opcao = s.nextLine();
+                if(opcao.equals("0"))
+                    break;
+                for (Encomenda e : encs) {
+                    if (e.getcodEncomenda().equals(opcao)) {
+                        String cod = b_dados.getVoluntarios().get(username).getCodVoluntario();
+                        String nome = b_dados.getVoluntarios().get(username).getNome();
+                        b_dados.novaEntrega(cod, nome, e.getcodEncomenda(), e.getcodUtilizador(), e.getcodLoja(), e.getPeso(), e.getLinhas());
+                        b_dados.removeEncomendaDisponivel(e);
+                        b_dados.getVoluntarios().get(username).setDisponibilidade(false);
+                        check=1;
+                        break;
+                    }
+                }
+                if(check==0){
+                    System.out.println("Código errado ou não existe!");
+                }
+            }
+        }
+    }
+
+    public void menuEncomendasTrans(String username){
+        ArrayList<Encomenda> encs=b_dados.buscaEncomendasTransportadora(username);
+        if(encs.isEmpty()){
+            System.out.println("Não existem encomendas disponiveis na sua localização");
+        }
+        else{
+            Scanner s=new Scanner(System.in);
+            while(!encs.isEmpty()) {
+                b_dados.buscaEncomendasDisplay(encs);
+                System.out.println("Digite o código de encomenda que a sua empresa está pronta a entregar");
+                String opcao = s.nextLine();
+                int check=0;
+                for (Encomenda e : encs) {
+                    if (e.getcodEncomenda().equals(opcao)) {
+                        String cod = b_dados.getTrasnportadoras().get(username).getCodEmpresa();
+                        String nome = b_dados.getTrasnportadoras().get(username).getNome();
+                        b_dados.novaEntrega(cod, nome, e.getcodEncomenda(), e.getcodUtilizador(), e.getcodLoja(), e.getPeso(), e.getLinhas());
+                        b_dados.removeEncomendaDisponivel(e);
+                        check=1;
+                        encs=b_dados.buscaEncomendasTransportadora(username);
+                        break;
+                    }
+                }
+                if(check==0){
+                    System.out.println("Código errado ou não existe!");
+                }
+            }
+            System.out.println("Não existem mais encomendas disponiveis!");
+        }
     }
 }
