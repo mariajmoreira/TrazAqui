@@ -247,7 +247,7 @@ public class Menu
                         double peso = calculaPeso(encs);
                         Encomenda e = b_dados.novaEncomenda(codUtilizador, codLoja, peso, encs);
                         System.out.println("Escolha o método de entrega");
-                        metodoEncomenda(codLoja,codUtilizador,e.getcodEncomenda());
+                        metodoEncomenda(codUtilizador,codLoja,e.getcodEncomenda());
                         break;
                     default:
                         System.out.print("Opção inválida\n\n");
@@ -311,6 +311,8 @@ public class Menu
     }
 
     public CatalogoProdutos buscaCatalogo(String cod) throws CatalogoNaoExisteException{
+        a_armazena.juntaCatalogos();
+        a_armazena.JuntaProdutos();
         for(CatalogoProdutos c : a_armazena.getCatalogos()){
             if(cod.equals(c.getCodLoja())){
                 return c;
@@ -719,8 +721,6 @@ public class Menu
      * MENUS CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO
      */
     private void menuCliente(String username){
-        a_armazena.juntaCatalogos();
-        a_armazena.JuntaProdutos();
         ArrayList<String> encs=b_dados.buscapraClassificar(username);
         if(!encs.isEmpty())
             menuClassifica(encs);
@@ -777,8 +777,6 @@ public class Menu
     }
 
     private void menuLoja(String username){
-        a_armazena.juntaCatalogos();
-        a_armazena.JuntaProdutos();
         Scanner s = new Scanner(System.in); int opcao = 0;
         try{
             do{
@@ -960,7 +958,8 @@ public class Menu
     }
 
     private void loginTransportadora(){
-        Scanner s = new Scanner(System.in); int contador = 0;
+        Scanner s = new Scanner(System.in);
+        int contador = 0;
         String username,pass,k;
         try{
             do{
@@ -1371,7 +1370,6 @@ public class Menu
             if(opcao.equals("0")){
                 break;
             }
-            label:
             for(String cod: encs){
                 if(b_dados.getHistorico().get(cod).getCod().equals(opcao)){
                     System.out.println("Escolha a classificação");

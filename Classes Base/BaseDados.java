@@ -3,6 +3,7 @@ package trazaqui;
 import trazaqui.Exceptions.*;
 import org.javatuples.Pair;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -508,7 +509,6 @@ public class BaseDados implements Serializable {
         t.setPrecokm(precokm);
         t.setUsername(user);
         t.setPassword(password);
-        t.setClassificacoes(new ArrayList<>());
         if(ExisteTransportadora(user)) throw new TransportadoraExisteException("Já existe um registo para esse username");
         this.transportadoras.put(t.getUsername(),t.clone());
     }
@@ -743,8 +743,8 @@ public class BaseDados implements Serializable {
 
     //método que determina a classificacao média
     //das transportadoras
-    public void classifMediaTrans(String user){
-        List<Classificacao> cl =this.transportadoras.get(user).getClassificacoes();
+    public void classifMediaTrans(LogTransportadora lt){
+        ArrayList<Classificacao> cl =lt.getClassificacoes();
         if (cl.isEmpty()){
             System.out.println("Esta transportadora ainda não recebeu nenhuma classificação");
         }
@@ -760,7 +760,7 @@ public class BaseDados implements Serializable {
 
     //dos voluntarios
     public void classifMediaVol(String user){
-        List<Classificacao> cl=this.voluntarios.get(user).getClassificacoes();
+        ArrayList<Classificacao> cl=this.voluntarios.get(user).getClassificacoes();
         if (cl.isEmpty())
             System.out.println("Este voluntário ainda não foi classificado");
         else {
@@ -950,7 +950,8 @@ public class BaseDados implements Serializable {
     public LogUtilizador getUtilizador(String cod){
         for(LogUtilizador c : this.utilizadores.values()){
             if(c.getCodUtilizador().equals(cod))
-                return c;        }
+                return c;
+        }
         return null;
     }
 
@@ -958,7 +959,8 @@ public class BaseDados implements Serializable {
     public LogLoja getLoja(String cod){
         for(LogLoja c : this.lojas.values()){
             if(c.getCodLoja().equals(cod))
-                return c;        }
+                return c;
+        }
         return null;
     }
 
@@ -966,7 +968,8 @@ public class BaseDados implements Serializable {
     public LogTransportadora getTrans(String cod){
         for(LogTransportadora c : this.transportadoras.values()){
             if(c.getCodEmpresa().equals(cod))
-                return c;        }
+                return c;
+        }
         return null;
     }
 
@@ -974,7 +977,8 @@ public class BaseDados implements Serializable {
     public LogVoluntario getVoluntario(String cod){
         for(LogVoluntario c : this.voluntarios.values()){
             if(c.getCodVoluntario().equals(cod))
-                return c;        }
+                return c;
+        }
         return null;
     }
 
@@ -1003,7 +1007,7 @@ public class BaseDados implements Serializable {
     public ArrayList<LogTransportadora> buscatransportadoras(String codutilizador, String codloja) {
         ArrayList<LogTransportadora> lt= new ArrayList<>();
         for(LogTransportadora t: this.transportadoras.values()){
-            if((t.getGps().distLocalizacao(getUtilizador(codutilizador).getGps())<t.getRaio()) && (t.getGps().distLocalizacao(getLoja(codloja).getGps())<t.getRaio())){
+            if ( t.getGps().distLocalizacao(getUtilizador(codutilizador).getGps())<t.getRaio() && t.getGps().distLocalizacao(getLoja(codloja).getGps())<t.getRaio() ){
                 lt.add(t);
             }
         }
@@ -1015,8 +1019,9 @@ public class BaseDados implements Serializable {
         for(LogTransportadora t: lt){
             System.out.println(t.getCodEmpresa());
             System.out.println(t.getNome());
-            System.out.println(t.getPrecokm());
-            classifMediaTrans(t.getUsername());
+            System.out.println(t.getPrecokm()+"€/km");
+            System.out.println(t.getClassificacoes());
+            classifMediaTrans(t);
             System.out.print("\n");
         }
     }
