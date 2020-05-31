@@ -1,9 +1,10 @@
 package trazaqui;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class Historico extends Encomenda{
+public class Historico extends Encomenda implements Serializable {
     private String cod;
     private String nome;
     private LocalDateTime date;
@@ -54,7 +55,7 @@ public class Historico extends Encomenda{
     //método toString
     public String toString(){
         StringBuilder sb=new StringBuilder();
-        sb.append(this.date).append("\n")
+        sb.append("Data:").append(this.date).append("\n")
                 .append("Entregue por:").append(this.nome).append("\n")
                 .append("Código:").append(this.cod).append("\n");
         sb.append(super.toString());

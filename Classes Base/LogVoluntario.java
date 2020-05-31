@@ -1,19 +1,20 @@
 package trazaqui;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class LogVoluntario extends Voluntario{
+public class LogVoluntario extends Voluntario implements Serializable {
     private String username;
     private String password;
     private boolean disponibilidade;
     private ArrayList<Classificacao> classificacoes;
 
     //getters
-    public String getUsername(){return username;}
+    public String getUsername(){return this.username;}
 
-    public String getPassword(){return password;}
+    public String getPassword(){return this.password;}
 
-    public boolean getDisponibilidade(){return disponibilidade;}
+    public boolean getDisponibilidade(){return this.disponibilidade;}
 
     public ArrayList<Classificacao> getClassificacoes(){return new ArrayList<>(this.classificacoes);}
 

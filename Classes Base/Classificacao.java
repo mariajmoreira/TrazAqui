@@ -1,10 +1,12 @@
 package trazaqui;
 
-public class Classificacao {
+import java.io.Serializable;
+
+public class Classificacao implements Serializable {
     private double classificacao;
 
     //getter
-    public double getClassificacao(){return classificacao;}
+    public double getClassificacao(){return this.classificacao;}
 
     //setter
     public void setClassificacao(double cl){this.classificacao=cl;}

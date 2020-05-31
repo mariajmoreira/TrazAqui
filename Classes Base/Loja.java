@@ -1,14 +1,16 @@
 package trazaqui;
 
-public class Loja {
+import java.io.Serializable;
+
+public class Loja implements Serializable {
     private String codLoja;
     private String nome;
     private Localizacao gps;
 
     //getters
-    public String getCodLoja(){return codLoja;}
+    public String getCodLoja(){return this.codLoja;}
 
-    public String getNome(){return nome;}
+    public String getNome(){return this.nome;}
 
     public Localizacao getGps(){return new Localizacao(this.gps.getX(),this.gps.getY());}
 
@@ -51,4 +53,6 @@ public class Loja {
         return sb.toString();
     }
 
+    //metodo loja
+    public Loja clone(){return new Loja(this);}
 }

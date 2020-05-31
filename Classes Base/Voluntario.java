@@ -1,6 +1,8 @@
 package trazaqui;
 
-public class Voluntario{
+import java.io.Serializable;
+
+public class Voluntario implements Serializable {
     private String codVoluntario;
     private String nome;
     private Localizacao gps;
@@ -8,13 +10,13 @@ public class Voluntario{
 
 
     //getters
-    public String getCodVoluntario(){return codVoluntario;}
+    public String getCodVoluntario(){return this.codVoluntario;}
 
-    public String getNome(){return nome;}
+    public String getNome(){return this.nome;}
 
     public Localizacao getGps(){return new Localizacao(this.gps.getX(),this.gps.getY());}
 
-    public double getRaio(){return raio;}
+    public double getRaio(){return this.raio;}
 
 
     //setters
@@ -36,10 +38,10 @@ public class Voluntario{
     }
 
     //construtor parametrizado
-    public Voluntario(String cod,String nome, Localizacao pos,double raio){
+    public Voluntario(String cod,String nome, Localizacao pos, double raio){
         this.codVoluntario=cod;
         this.nome=nome;
-        this.setGps(pos);
+        setGps(pos);
         this.raio=raio;
     }
 
@@ -47,7 +49,7 @@ public class Voluntario{
     public Voluntario(Voluntario v){
         this.codVoluntario=v.getCodVoluntario();
         this.nome=v.getNome();
-        this.setGps(v.getGps());
+        setGps(v.getGps());
         this.raio=v.getRaio();
     }
 
@@ -62,6 +64,7 @@ public class Voluntario{
         return sb.toString();
     }
 
-
+    //metodo clone
+    public Voluntario clone(){ return new Voluntario(this);}
 
 }

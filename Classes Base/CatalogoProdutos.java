@@ -1,10 +1,11 @@
-package trazAqui;
+package trazaqui;
 
-import trazAqui.Exceptions.ProdutoNaoExisteException;
+import trazaqui.Exceptions.ProdutoNaoExisteException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class CatalogoProdutos {
+public class CatalogoProdutos implements Serializable {
     private String codLoja;
     private ArrayList<Produto> produtos;
 
@@ -27,7 +28,7 @@ public class CatalogoProdutos {
     }
 
     public ArrayList<Produto> getProdutos(){
-       return new ArrayList<>(this.produtos);
+        return new ArrayList<>(this.produtos);
     }
 
     public void setProdutos(ArrayList<Produto> prod){
@@ -48,7 +49,7 @@ public class CatalogoProdutos {
                 return p;
             }
         }
-       throw new ProdutoNaoExisteException();
+        throw new ProdutoNaoExisteException();
     }
 
     public CatalogoProdutos clone() {

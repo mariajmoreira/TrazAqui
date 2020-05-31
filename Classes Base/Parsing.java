@@ -22,34 +22,28 @@ public class Parsing {
                 case "Utilizador":
                     Utilizador u = parseUtilizador(linhaPartida[1]); // criar um Utilizador
                     a_armazena.novoUtilizador(u);
-                    System.out.println(u.toString()); //enviar para o ecrÃ¡n apenas para teste
                     break;
                 case "Loja":
                     Loja l = parseLoja(linhaPartida[1]);
                     a_armazena.novaLoja(l);
-                    System.out.println(l.toString());
                     break;
                 case "Transportadora":
                     Transportadora t = parseTransportadora(linhaPartida[1]); // criar um Utilizador
                     a_armazena.novaTransportadora(t);
-                    System.out.println(t.toString()); //enviar para o ecrÃ¡n apenas para teste
                     break;
                 case "Voluntario":
                     Voluntario v = parseVoluntario(linhaPartida[1]); // criar um Utilizador
                     a_armazena.novoVoluntario(v);
-                    System.out.println(v.toString()); //enviar para o ecrÃ¡n apenas para teste
                     break;
                 case "Encomenda":
                     Encomenda e = parseEncomenda(linhaPartida[1]);// criar um Utilizador
                     CatalogoProdutos c = parseCatalogo(linhaPartida[1]);
                     a_armazena.novaEncomenda(e);
                     a_armazena.novoCatalogoProdutos(c);
-                    System.out.println(e.toString()); //enviar para o ecrÃ¡n apenas para teste
                     break;
                 case "Aceite":
                     String cod=linhaPartida[1];
                     a_armazena.adicionaCodigo(cod);
-                    System.out.println("Aceite:"+cod);
                     break;
                 default:
                     System.out.println("Linha invÃ¡lida.");

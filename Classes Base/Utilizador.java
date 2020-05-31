@@ -1,14 +1,16 @@
 package trazaqui;
 
-public class Utilizador {
+import java.io.Serializable;
+
+public class Utilizador implements Serializable {
     private String codUtilizador;
     private String nome;
     private Localizacao gps;
 
     //getters
-    public String getCodUtilizador(){return codUtilizador;}
+    public String getCodUtilizador(){return this.codUtilizador;}
 
-    public String getNome(){return nome;}
+    public String getNome(){return this.nome;}
 
     public Localizacao getGps(){return new Localizacao(this.gps.getX(),this.gps.getY());}
 
@@ -38,18 +40,21 @@ public class Utilizador {
     //construtor por cópia
 
     public Utilizador(Utilizador u){
-        this.codUtilizador=getCodUtilizador();
-        this.nome=getNome();
+        this.codUtilizador=u.getCodUtilizador();
+        this.nome=u.getNome();
         setGps(u.getGps());
     }
 
     //metodo toString
     public String toString(){
         StringBuilder sb= new StringBuilder();
-        sb.append("Utilizador:\n").append("Nome:").append(this.nome).append("\n")
-                .append("Código Utilizador:").append(this.codUtilizador).append("\n")
-                .append("Coordenadas:").append("(").append(this.gps).append("\n");
-
+        sb.append("Utilizador:").append("\n")
+                .append("Código de Utilizador:").append(this.codUtilizador).append("\n")
+                .append("Nome:").append(this.nome).append("\n")
+                .append("GPS:").append(this.gps).append("\n");
         return sb.toString();
     }
+
+    //metodo clone
+    public Utilizador clone(){ return new Utilizador(this);}
 }

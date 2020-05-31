@@ -1,6 +1,6 @@
-package trazAqui;
+package trazaqui;
 
-import trazAqui.Exceptions.*;
+import trazaqui.Exceptions.*;
 
 import java.io.IOException;
 import java.io.FileOutputStream;
@@ -27,14 +27,9 @@ public class Main
      * Método que inicia o programa
      */
     public static void main(String[] args) throws UtilizadorExisteException, CodigoJaEstaEmUsoException, LojaExisteException, TransportadoraExisteException, VoluntarioExisteException, EncomendaExisteException {
-
-        BaseDados database = new BaseDados();
         Armazena armazena = new Armazena();
         Parsing p = new Parsing(armazena);
-        Menu main_menu = new Menu(database,armazena);
-        //System.out.println(armazena.getEncomenda("e6813").getLinhas().toString());
-        //System.out.println(database.getLo("e6813").getLinhas().toString());
+        Menu main_menu = new Menu(armazena);
     }
-
 
 }

@@ -1,6 +1,8 @@
 package trazaqui;
 
-public class Transportadora {
+import java.io.Serializable;
+
+public class Transportadora implements Serializable {
     private String codEmpresa;
     private String nome;
     private Localizacao gps;
@@ -10,17 +12,17 @@ public class Transportadora {
 
 
     //getters
-    public String getCodEmpresa(){return codEmpresa;}
+    public String getCodEmpresa(){return this.codEmpresa;}
 
-    public String getNome(){return nome;}
+    public String getNome(){return this.nome;}
 
     public Localizacao getGps(){return new Localizacao(this.gps.getX(),this.gps.getY());}
 
-    public String getNif(){return nif;}
+    public String getNif(){return this.nif;}
 
-    public double getRaio(){return raio; }
+    public double getRaio(){return this.raio; }
 
-    public double getPrecokm(){return precokm;}
+    public double getPrecokm(){return this.precokm;}
 
     //setters
     public void setCodEmpresa(String ce){this.codEmpresa=ce;}
@@ -68,11 +70,14 @@ public class Transportadora {
     //metodo toString
     public String toString(){
         StringBuilder sb=new StringBuilder();
-        sb.append("Trasnportador:\n").append("Codigo da Empresa:").append(this.codEmpresa)
+        sb.append("Transportador:\n").append("Codigo da Empresa:").append(this.codEmpresa)
                 .append("\n").append("Nome:").append(this.nome)
                 .append("\n").append("Gps:").append(this.gps)
                 .append("\n").append("Raio").append(this.raio)
                 .append("\n").append("Preço por Km:").append(this.precokm).append("\n");
         return sb.toString();
     }
+
+    //metodo clone
+    public Transportadora clone(){ return new Transportadora(this);}
 }

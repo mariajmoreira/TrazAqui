@@ -1,13 +1,15 @@
 package trazaqui;
 
-public class LogUtilizador extends Utilizador {
+import java.io.Serializable;
+
+public class LogUtilizador extends Utilizador implements Serializable {
     private String username;
     private String password;
 
     //getters
-    public String getUsername(){return username;}
+    public String getUsername(){return this.username;}
 
-    public String getPassword(){return password;}
+    public String getPassword(){return this.password;}
 
     //setters
     public void setUsername(String user){this.username=user;}
@@ -46,7 +48,7 @@ public class LogUtilizador extends Utilizador {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
         sb.append("Username:").append(this.username).append("\n");
-        sb.append("Password").append(this.password).append("\n");
+        sb.append("Password:").append(this.password).append("\n");
         return sb.toString();
     }
 

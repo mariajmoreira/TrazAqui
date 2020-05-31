@@ -1,17 +1,18 @@
 package trazaqui;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LogLoja extends Loja{
+public class LogLoja extends Loja implements Serializable {
     private String username;
     private String password;
     private CatalogoProdutos cp;
 
     //getters
-    public String getUsername(){return username;}
+    public String getUsername(){return this.username;}
 
-    public String getPassword(){return password;}
+    public String getPassword(){return this.password;}
 
     public CatalogoProdutos getCatalogoProdutos(){return this.cp;}
 

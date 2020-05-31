@@ -1,8 +1,9 @@
-package trazAqui;
+package trazaqui;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class LinhaEncomenda {
+public class LinhaEncomenda implements Serializable {
     private String codProd;
     private String descricao;
     private double preco;
@@ -76,9 +77,9 @@ public class LinhaEncomenda {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Encomendas:\n").append("Codigo Produto:").append(this.codProd).append("\n").append("Descriçao:")
-                .append(this.descricao).append("\n").append("Preco:").append(this.preco)
-                .append("\n");
+        sb.append("\n").append("Codigo Produto:").append(this.codProd).append("\n").append("Descriçao:")
+                .append(this.descricao).append("\n").append("Preco:").append(this.preco).append("€")
+                .append("\n").append("Quantidade:").append(this.quantidade).append("Kg");
         return sb.toString();
     }
 }

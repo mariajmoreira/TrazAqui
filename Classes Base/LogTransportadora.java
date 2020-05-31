@@ -1,16 +1,17 @@
 package trazaqui;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class LogTransportadora extends Transportadora{
+public class LogTransportadora extends Transportadora implements Serializable {
     private String username;
     private String password;
     private ArrayList<Classificacao> classificacoes;
 
     //getters
-    public String getUsername(){return username;}
+    public String getUsername(){return this.username;}
 
-    public String getPassword(){return password;}
+    public String getPassword(){return this.password;}
 
     public ArrayList<Classificacao> getClassificacoes(){return new ArrayList<>(this.classificacoes);}
 
@@ -47,7 +48,7 @@ public class LogTransportadora extends Transportadora{
     //construtor por cópia
     public LogTransportadora(LogTransportadora log){
         super(log.getCodEmpresa(),log.getNome(),log.getGps(),log.getNif(),log.getRaio(),log.getPrecokm());
-        this.username=log.getNome();
+        this.username=log.getUsername();
         this.password=log.getPassword();
         setClassificacoes(log.getClassificacoes());
     }

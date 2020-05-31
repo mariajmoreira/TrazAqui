@@ -1,8 +1,8 @@
-package trazAqui;
+package trazaqui;
 
-
+import java.io.Serializable;
 import java.util.ArrayList;
-public class Encomenda {
+public class Encomenda implements Serializable {
     private String codEncomenda;
     private String codUtilizador;
     private String codLoja;
@@ -51,6 +51,22 @@ public class Encomenda {
         }
     }
 
+    public void setCodEncomenda(String cod){
+        this.codEncomenda=cod;
+    }
+
+    public void setCodLoja(String cod){
+        this.codLoja=cod;
+    }
+
+    public void setCodUtilizador(String cod){
+        this.codUtilizador=cod;
+    }
+
+    public void setPeso(double p){
+        this.peso=p;
+    }
+
     public String getcodEncomenda(){
         return this.codEncomenda;
     }
@@ -67,45 +83,6 @@ public class Encomenda {
         return this.peso;
     }
 
-   /* public double calculaValorTotal(){
-        double valor=0;
-        for(int i=0; i<linhas.size();i++){
-            valor += linhas.get(i).calculaValorLinhaEnc();
-        }
-        return valor;
-    }
-
-    public double calculaValorDesconto(){
-        double valor=0;
-        for(int i=0; i<linhas.size();i++){
-            valor += linhas.get(i).calculaValorDesconto();
-        }
-        return valor;
-    }
-
-    public int numeroTotalProdutos(){
-        int numeroProdutos = this.linhas.size();
-        return numeroProdutos;
-    }
-
-    public boolean existeProdutoEncomenda(String refProduto){
-        return this.linhas.contains(refProduto);
-    }
-
-    public void adicionaLinha (LinhaEncomenda l){
-        this.linhas.add(l);
-    }
-
-    public void removeProduto(String codProd){
-        for(int i=0; i<linhas.size();i++){
-            if (codProd == linhas.get(i).toString()){
-                this.linhas.remove(i);
-            }
-        }
-    }
-
-    */
-
     public Encomenda clone() {
         return new Encomenda(this);
     }
@@ -119,12 +96,16 @@ public class Encomenda {
         return sb.toString();
     }
 
-  /*  public boolean equals (Object o){
-        if(o==this) return true;
-        if(o==null || o.getClass() != this.getClass()) return false;
-        Encomenda_ArrayList e = (Encomenda_ArrayList) o;
-        return this.nome.equals(e.getNome()) && this.nfc.equals(e.getNfc());
+    public boolean equals(Object o){
+        if (o==this) return true;
+        if (o==null || o.getClass()!=this.getClass()) return false;
+        Encomenda e= (Encomenda) o;
+
+        return e.getcodEncomenda().equals(this.getcodEncomenda())
+                && e.getcodUtilizador().equals(this.getcodUtilizador())
+                && e.getcodLoja().equals(this.getcodLoja())
+                && e.getPeso()==this.getPeso()
+                && e.getLinhas().equals(this.getLinhas());
     }
 
-   */
 }

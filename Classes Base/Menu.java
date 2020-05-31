@@ -1,18 +1,18 @@
 package trazaqui;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import trazaqui.Exceptions.*;
 import java.time.format.DateTimeParseException;
 
-public class Menu
-{
+public class Menu implements Serializable{
 
     private BaseDados b_dados;
     private Armazena a_armazena;
 
-    public Menu(BaseDados base_dados, Armazena armazena){
-        b_dados = base_dados;
+    public Menu(Armazena armazena){
+        b_dados = lerEstado("Estado.bin");
         a_armazena=armazena;
         menuInicial();
     }
@@ -131,6 +131,8 @@ public class Menu
         b_dados.setLocalizacaovoluntario(username, cordx, cordy);
     }
 
+
+
     public double calculaPreco(double preco,double stock,double quant){
         return ((preco*quant)/stock);
     }
@@ -141,38 +143,6 @@ public class Menu
             res+=e.getQuantidade();
         }
         return res;
-    }
-
-    public void metodoEntrega(){
-        try {
-            String opcao;
-            do {
-                System.out.println("Escolha o metodo de entrega");
-                System.out.println("1 - Empresa Transportadora");
-                System.out.println("2 - Voluntario");
-                System.out.println("0 - Retroceder");
-
-                Scanner s = new Scanner(System.in);
-                opcao = s.nextLine();
-                if(opcao.equals("0")){
-                    break;
-                }
-
-                switch (opcao) {
-                    case "1":
-
-                    case "2":
-
-                    default:
-                        System.out.print("Opção inválida\n\n");
-                        break;
-                }
-            }
-            while (true);
-        } catch (InputMismatchException e) {
-            System.out.println("Entrada inválida");
-        }
-
     }
 
     public void fazerEncomenda(String codLoja,String codUtilizador){
@@ -824,9 +794,9 @@ public class Menu
                 System.out.println("Escolha o que pretende fazer");
                 System.out.println("1 - Encomendas dentro do raio");
                 System.out.println("2 - Dados pessoais");
-                System.out.println("3 - Historico de encomendas ");
+                System.out.println("3 - Historico de encomendas");
                 System.out.println("4 - Classificações");
-
+                System.out.println("5 - Sinalizar que uma encomenda foi entregue");
                 System.out.println("0 - Retroceder");
 
                 opcao = s.nextInt();
@@ -841,6 +811,9 @@ public class Menu
                         break;
                     case 3:
                         b_dados.buscaHistoricoDisplay(b_dados.buscaHistoricoTransportadora(b_dados.getTrasnportadoras().get(username).getCodEmpresa()));
+                        break;
+                    case 5:
+                        menuEntregueTrans(username);
                         break;
                     default:
                         System.out.print("Opção inválida\n\n");
@@ -869,6 +842,7 @@ public class Menu
                 System.out.println("2 - historico de encomendas");
                 System.out.println("3 - Dados pessoais");
                 System.out.println("4 - Classificaçoes");
+                System.out.println("5 - Sinalizar que uma encomenda foi entregue");
                 System.out.println("0 - Retroceder");
 
                 opcao = s.nextInt();
@@ -884,6 +858,8 @@ public class Menu
                     case 3:
                         consultadadosVoluntario(username);
                         break;
+                    case 5:
+                        menuEntregueVol(username);
                     default:
                         System.out.print("Opção inválida\n\n");
                         break;
@@ -1208,6 +1184,7 @@ public class Menu
                         submenuVoluntario();
                         break;
                     case 0:
+                        guardaEstado("Estado.bin");
                         break;
 
                     default:
@@ -1253,6 +1230,11 @@ public class Menu
                             System.out.println("Não existe uma encomenda com esse código!");
                         }
                     }
+                    encs=b_dados.buscaEncomendas(cod);
+                    if(encs.isEmpty()) {
+                        System.out.println("Não existem mais encomendas.");
+                        break;
+                    }
                 }
             }
             while(true);
@@ -1265,6 +1247,7 @@ public class Menu
         }
     }
 
+    //menu para um cliente decidir o método de entrega que deseja usar
     public void metodoEncomenda(String codUtilizador, String codLoja, String codEncomenda){
         int i=0;
         try{
@@ -1287,6 +1270,7 @@ public class Menu
                             System.out.println("2-Cancelar encomenda");
                             String op = s.nextLine();
                             if (op.equals("1")){
+                                b_dados.addVol(codEncomenda);
                                 System.out.println("Pedido efetuado com sucesso");
                                 System.out.print("Encomenda efetuada com sucesso!\n");
                                 System.out.print("Codigo da sua Encomenda:" + codEncomenda);
@@ -1329,6 +1313,7 @@ public class Menu
                         }
                         break;
                     case "2":
+                        b_dados.addVol(codEncomenda);
                         System.out.println("Pedido efetuado com sucesso");
                         System.out.print("Encomenda efetuada com sucesso!\n");
                         System.out.print("Codigo da sua Encomenda:" + codEncomenda);
@@ -1347,6 +1332,7 @@ public class Menu
         }
     }
 
+    //método que printa uma mensagem com o estado em que uma determinada encomenda se encontra
     public void EstadoEncomenda(){
         Scanner s=new Scanner(System.in);
         try {
@@ -1443,16 +1429,16 @@ public class Menu
                             System.out.println(e.getMessage());
                         }
                     }
+                    break;
                 }
             }
+            break;
         }while(true);
-
-
     }
 
-
+    //menu para um voluntário escolher a encomenda que decide entregar
     public void menuEncomendasVol(String username){
-        ArrayList<Encomenda> encs=b_dados.buscaEncomendasVoluntario(username);
+        ArrayList<Encomenda> encs=b_dados.buscaEncomendaVoluntario(username);
         if(encs.isEmpty()){
             System.out.println("Não existem encomendas disponiveis na sua localização");
         }
@@ -1484,6 +1470,7 @@ public class Menu
         }
     }
 
+    //menu para uma transportadora sinalizar que foi entregar uma encomenda
     public void menuEncomendasTrans(String username){
         ArrayList<Encomenda> encs=b_dados.buscaEncomendasTransportadora(username);
         if(encs.isEmpty()){
@@ -1513,5 +1500,100 @@ public class Menu
             }
             System.out.println("Não existem mais encomendas disponiveis!");
         }
+    }
+
+    //menu para uma transportadora sinalizar que uma encomenda foi entregue
+    public void menuEntregueTrans(String username){
+        Scanner s= new Scanner(System.in);
+        ArrayList<Historico> encs=b_dados.buscaEncomendaEntregueTrans(username);
+        if (encs.isEmpty()){
+            System.out.println("Não existem encomendas por entregar.");
+        }
+        else {
+            do {
+                b_dados.buscaHistoricoDisplay(encs);
+                System.out.println("0 - Retroceder");
+                System.out.println("Digite o código de encomenda que deseja sinalizar como entregue:");
+                String opcao = s.nextLine();
+                if(opcao.equals("0"))
+                    break;
+                int check=0;
+                for(Historico h:encs){
+                    if(h.getcodEncomenda().equals(opcao)){
+                        b_dados.addHistorico(h);
+                        b_dados.removeEntrega(h);
+                        b_dados.addClassifica(h.getcodEncomenda());
+                        check=1;
+                        break;
+                    }
+                }
+                if(check==0)
+                    System.out.println("Código inválido ou não exite.");
+                encs=b_dados.buscaEncomendaEntregueTrans(username);
+            }while(!encs.isEmpty());
+            if (encs.isEmpty())
+                System.out.println("Não existem mais encomendas por entregar");
+
+        }
+    }
+
+    //menu para um voluntário sinalizar que uma encomenda foi entregue
+    public void menuEntregueVol(String username){
+        Scanner s=new Scanner(System.in);
+        Historico h=b_dados.buscaEncomendaEntregueVol(username);
+        if(h.equals(new Historico()))
+            System.out.println("Não existe nenhuma encomenda a ser entregue");
+
+        else{
+            do{
+                System.out.println(h.toString());
+                System.out.println("Deseja confirmar que esta encomenda foi entregue?");
+                System.out.println("1 - Confirmar");
+                System.out.println("0 - Retroceder");
+                String opcao=s.nextLine();
+                if(opcao.equals("0")){
+                    break;
+                }
+                else if(opcao.equals("1")){
+                    b_dados.addHistorico(h);
+                    b_dados.removeEntrega(h);
+                    b_dados.getVoluntarios().get(username).setDisponibilidade(true);
+                    break;
+                }
+                else{
+                    System.out.println("Opção invalida!");
+                }
+            }while(true);
+        }
+    }
+
+    //método para guardar uma classe num ficheiro
+    public void guardaEstado(String filename){
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
+            out.writeObject(b_dados);
+            out.close();
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    //método para ler um estado e carregá-lo
+    public BaseDados lerEstado(String filename){
+        try{
+            ObjectInputStream in= new ObjectInputStream(new FileInputStream(filename));
+            BaseDados b= (BaseDados) in.readObject();
+            in.close();
+            return b;
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        return new BaseDados();
     }
 }
