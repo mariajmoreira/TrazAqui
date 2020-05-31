@@ -1,18 +1,18 @@
 package trazaqui;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import trazaqui.Exceptions.*;
 import java.time.format.DateTimeParseException;
 
-public class Menu
-{
+public class Menu implements Serializable{
 
     private BaseDados b_dados;
     private Armazena a_armazena;
 
-    public Menu(BaseDados base_dados, Armazena armazena){
-        b_dados = base_dados;
+    public Menu(Armazena armazena){
+        b_dados = lerEstado("Estado.bin");
         a_armazena=armazena;
         menuInicial();
     }
@@ -1184,6 +1184,7 @@ public class Menu
                         submenuVoluntario();
                         break;
                     case 0:
+                        guardaEstado("Estado.bin");
                         break;
 
                     default:
@@ -1564,5 +1565,36 @@ public class Menu
                 }
             }while(true);
         }
+    }
+
+    //método para guardar uma classe num ficheiro
+    public void guardaEstado(String filename){
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
+            out.writeObject(b_dados);
+            out.close();
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.println("Estado guardado");
+    }
+
+    //método para ler um estado e carregá-lo
+    public BaseDados lerEstado(String filename){
+        try{
+            ObjectInputStream in= new ObjectInputStream(new FileInputStream(filename));
+            BaseDados b= (BaseDados) in.readObject();
+            in.close();
+            return b;
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        return new BaseDados();
     }
 }

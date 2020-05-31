@@ -2,7 +2,8 @@ package trazaqui;
 
 import trazaqui.Exceptions.*;
 import org.javatuples.Pair;
-import java.io.Serializable;
+
+import java.io.*;
 import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -1107,7 +1108,6 @@ public class BaseDados implements Serializable {
             System.out.println(s);
         }
     }
-
 
     //método que devolve uma lista de encomendas disponiveis para um empresa transportadora entregar
     public ArrayList<Encomenda> buscaEncomendasTransportadora(String username){
