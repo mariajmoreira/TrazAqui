@@ -693,7 +693,7 @@ public class Menu implements Serializable{
     private void menuCliente(String username){
         ArrayList<String> encs=b_dados.buscapraClassificar(username);
         if(!encs.isEmpty())
-            menuClassifica(encs);
+            menuClassifica(encs,username);
         Scanner s = new Scanner(System.in);
         int opcao = 0;
         String op="";
@@ -1346,7 +1346,7 @@ public class Menu implements Serializable{
     }
 
     //menu para um cliente classificar uma transportadora/voluntário
-    public void menuClassifica(ArrayList<String> encs){
+    public void menuClassifica(ArrayList<String> encs,String username){
         Scanner s=new Scanner(System.in);
         do{
             b_dados.displaypraClassificar(encs);
@@ -1371,46 +1371,66 @@ public class Menu implements Serializable{
                             switch (op) {
                                 case "1": {
                                     Classificacao c = new Classificacao(1.0);
-                                    if(opcao.charAt(0)=='t')
+                                    if(opcao.charAt(0)=='t') {
                                         b_dados.classifTrans(opcao, c);
-                                    else if(opcao.charAt(0)=='v')
-                                        b_dados.classifVol(opcao,c);
+                                        b_dados.removeClassifica(cod);
+                                    }
+                                    else if(opcao.charAt(0)=='v'){
+                                        b_dados.classifVol(opcao, c);
+                                        b_dados.removeClassifica(cod);
+                                    }
                                     i=1;
                                     break;
                                 }
                                 case "2": {
                                     Classificacao c = new Classificacao(2.0);
-                                    if(opcao.charAt(0)=='t')
+                                    if(opcao.charAt(0)=='t'){
                                         b_dados.classifTrans(opcao, c);
-                                    else if(opcao.charAt(0)=='v')
-                                        b_dados.classifVol(opcao,c);
+                                        b_dados.removeClassifica(cod);
+                                    }
+                                    else if(opcao.charAt(0)=='v'){
+                                        b_dados.classifVol(opcao, c);
+                                        b_dados.removeClassifica(cod);
+                                    }
                                     i=1;
                                     break;
                                 }
                                 case "3": {
                                     Classificacao c = new Classificacao(3.0);
-                                    if(opcao.charAt(0)=='t')
+                                    if(opcao.charAt(0)=='t'){
                                         b_dados.classifTrans(opcao, c);
-                                    else if(opcao.charAt(0)=='v')
-                                        b_dados.classifVol(opcao,c);
+                                        b_dados.removeClassifica(cod);
+                                    }
+                                    else if(opcao.charAt(0)=='v'){
+                                        b_dados.classifVol(opcao, c);
+                                        b_dados.removeClassifica(cod);
+                                    }
                                     i=1;
                                     break;
                                 }
                                 case "4": {
                                     Classificacao c = new Classificacao(4.0);
-                                    if(opcao.charAt(0)=='t')
+                                    if(opcao.charAt(0)=='t'){
                                         b_dados.classifTrans(opcao, c);
-                                    else if(opcao.charAt(0)=='v')
-                                        b_dados.classifVol(opcao,c);
+                                        b_dados.removeClassifica(cod);
+                                    }
+                                    else if(opcao.charAt(0)=='v'){
+                                        b_dados.classifVol(opcao, c);
+                                        b_dados.removeClassifica(cod);
+                                    }
                                     i=1;
                                     break;
                                 }
                                 case "5": {
                                     Classificacao c = new Classificacao(5.0);
-                                    if(opcao.charAt(0)=='t')
+                                    if(opcao.charAt(0)=='t'){
                                         b_dados.classifTrans(opcao, c);
-                                    else if(opcao.charAt(0)=='v')
-                                        b_dados.classifVol(opcao,c);
+                                        b_dados.removeClassifica(cod);
+                                    }
+                                    else if(opcao.charAt(0)=='v'){
+                                        b_dados.classifVol(opcao, c);
+                                        b_dados.removeClassifica(cod);
+                                    }
                                     i=1;
                                     break;
                                 }
@@ -1432,8 +1452,8 @@ public class Menu implements Serializable{
                     break;
                 }
             }
-            break;
-        }while(true);
+            encs=b_dados.buscapraClassificar(username);
+        }while(!encs.isEmpty());
     }
 
     //menu para um voluntário escolher a encomenda que decide entregar
@@ -1520,6 +1540,7 @@ public class Menu implements Serializable{
                 int check=0;
                 for(Historico h:encs){
                     if(h.getcodEncomenda().equals(opcao)){
+                        h.setDate();
                         b_dados.addHistorico(h);
                         b_dados.removeEntrega(h);
                         b_dados.addClassifica(h.getcodEncomenda());
@@ -1555,6 +1576,7 @@ public class Menu implements Serializable{
                     break;
                 }
                 else if(opcao.equals("1")){
+                    h.setDate();
                     b_dados.addHistorico(h);
                     b_dados.removeEntrega(h);
                     b_dados.getVoluntarios().get(username).setDisponibilidade(true);
