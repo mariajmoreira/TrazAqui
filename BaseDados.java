@@ -222,6 +222,9 @@ public class BaseDados implements Serializable {
     //método que remove uma encomenda da lista de entregas
     public void removeEntrega(Historico h){this.entregas.remove(h.clone());}
 
+    //método que remove um codigo encomenda da lista de encomendas por classificar
+    public void removeClassifica(String cod){this.classifica.remove(cod);}
+
     //metodo que verifica se um determinado user existe
     //utilizadores
     public boolean ExisteUtilizador(String user){
