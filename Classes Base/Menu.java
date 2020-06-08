@@ -131,8 +131,6 @@ public class Menu implements Serializable{
         b_dados.setLocalizacaovoluntario(username, cordx, cordy);
     }
 
-
-
     public double calculaPreco(double preco,double stock,double quant){
         return ((preco*quant)/stock);
     }
@@ -218,6 +216,7 @@ public class Menu implements Serializable{
                         Encomenda e = b_dados.novaEncomenda(codUtilizador, codLoja, peso, encs);
                         System.out.println("Escolha o método de entrega");
                         metodoEncomenda(codUtilizador,codLoja,e.getcodEncomenda());
+                        encs=new ArrayList<>();
                         break;
                     default:
                         System.out.print("Opção inválida\n\n");
@@ -269,7 +268,6 @@ public class Menu implements Serializable{
         }
     }
 
-
     /**
      *Lojas por ordem alfabetica
      */
@@ -281,8 +279,6 @@ public class Menu implements Serializable{
     }
 
     public CatalogoProdutos buscaCatalogo(String cod) throws CatalogoNaoExisteException{
-        a_armazena.juntaCatalogos();
-        a_armazena.JuntaProdutos();
         for(CatalogoProdutos c : a_armazena.getCatalogos()){
             if(cod.equals(c.getCodLoja())){
                 return c;
@@ -290,6 +286,7 @@ public class Menu implements Serializable{
         }
         throw new CatalogoNaoExisteException();
     }
+
     /**
      * ASSOCIAR CONTA CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO
      */
@@ -518,7 +515,6 @@ public class Menu implements Serializable{
     }
 
     private void registoVoluntario(){
-        boolean disponibilidade = true;
         Scanner s = new Scanner(System.in);
         System.out.println("Introduza o seu Nome");
         String nome = s.nextLine();
@@ -533,18 +529,9 @@ public class Menu implements Serializable{
         Localizacao pos = new Localizacao(gpsx,gpsy);
         System.out.println("Introduza o seu raio de atuação");
         double raio= Double.parseDouble(s.nextLine());
-        System.out.println("Encontra-se disponivel para realizar entregas?");
-        System.out.println("1-Sim");
-        System.out.println("2-Nao");
-        int d = Integer.parseInt(s.nextLine());
-        if(d == 1){
-            disponibilidade = true;
-        } if(d==2){
-            disponibilidade =false;
-        }
 
         try{
-            b_dados.novoVoluntario(nome,pos,raio,username,pass,disponibilidade);
+            b_dados.novoVoluntario(nome,pos,raio,username,pass,true);
         }
 
         catch(VoluntarioExisteException e){
@@ -691,6 +678,8 @@ public class Menu implements Serializable{
      * MENUS CLIENTE, LOJA, TRANSPORTADORA, VOLUNTARIO
      */
     private void menuCliente(String username){
+        a_armazena.juntaCatalogos();
+        a_armazena.JuntaProdutos();
         ArrayList<String> encs=b_dados.buscapraClassificar(username);
         if(!encs.isEmpty())
             menuClassifica(encs,username);
@@ -744,6 +733,8 @@ public class Menu implements Serializable{
     }
 
     private void menuLoja(String username){
+        a_armazena.juntaCatalogos();
+        a_armazena.JuntaProdutos();
         Scanner s = new Scanner(System.in); int opcao = 0;
         try{
             do{
@@ -850,7 +841,10 @@ public class Menu implements Serializable{
 
                 switch(opcao){
                     case 1:
-                        menuEncomendasVol(username);
+                        if(b_dados.getVoluntarios().get(username).getDisponibilidade())
+                            menuEncomendasVol(username);
+                        else
+                            System.out.println("Você já se encontrar a transportar uma encomenda.");
                         break;
                     case 2:
                         b_dados.buscaHistoricoDisplay(b_dados.buscaHistoricoVoluntario(b_dados.getVoluntarios().get(username).getCodVoluntario()));
@@ -860,6 +854,7 @@ public class Menu implements Serializable{
                         break;
                     case 5:
                         menuEntregueVol(username);
+                        break;
                     default:
                         System.out.print("Opção inválida\n\n");
                         break;
@@ -1476,7 +1471,8 @@ public class Menu implements Serializable{
                     if (e.getcodEncomenda().equals(opcao)) {
                         String cod = b_dados.getVoluntarios().get(username).getCodVoluntario();
                         String nome = b_dados.getVoluntarios().get(username).getNome();
-                        b_dados.novaEntrega(cod, nome, e.getcodEncomenda(), e.getcodUtilizador(), e.getcodLoja(), e.getPeso(), e.getLinhas());
+                        double kms=b_dados.getVoluntarios().get(username).getGps().distLocalizacao(b_dados.getLoja(e.getcodLoja()).getGps())+ b_dados.getVoluntarios().get(username).getGps().distLocalizacao(b_dados.getUtilizador(e.getcodUtilizador()).getGps());
+                        b_dados.novaEntrega(cod, nome, e.getcodEncomenda(), e.getcodUtilizador(), e.getcodLoja(), e.getPeso(), e.getLinhas(),kms);
                         b_dados.removeEncomendaDisponivel(e);
                         b_dados.getVoluntarios().get(username).setDisponibilidade(false);
                         check=1;
@@ -1507,7 +1503,8 @@ public class Menu implements Serializable{
                     if (e.getcodEncomenda().equals(opcao)) {
                         String cod = b_dados.getTrasnportadoras().get(username).getCodEmpresa();
                         String nome = b_dados.getTrasnportadoras().get(username).getNome();
-                        b_dados.novaEntrega(cod, nome, e.getcodEncomenda(), e.getcodUtilizador(), e.getcodLoja(), e.getPeso(), e.getLinhas());
+                        double kms=b_dados.getTrasnportadoras().get(username).getGps().distLocalizacao(b_dados.getLoja(e.getcodLoja()).getGps())+ b_dados.getTrasnportadoras().get(username).getGps().distLocalizacao(b_dados.getUtilizador(e.getcodUtilizador()).getGps());
+                        b_dados.novaEntrega(cod, nome, e.getcodEncomenda(), e.getcodUtilizador(), e.getcodLoja(), e.getPeso(), e.getLinhas(),kms);
                         b_dados.removeEncomendaDisponivel(e);
                         check=1;
                         encs=b_dados.buscaEncomendasTransportadora(username);
@@ -1617,5 +1614,33 @@ public class Menu implements Serializable{
             System.out.println(e.getMessage());
         }
         return new BaseDados();
+    }
+
+    public void menuAlterarProdutos(String username){
+        Scanner s= new Scanner(System.in);
+        CatalogoProdutos cp=b_dados.getLojas().get(username).getCatalogoProdutos();
+        do {
+            System.out.println("Escolha o que pretende fazer");
+            System.out.println("1 - Adicionar um produto");
+            System.out.println("2 - Atualizar um produto");
+            System.out.println("3 - Remover um produto");
+            System.out.println("0 - Retroceder");
+            String opcao=s.nextLine();
+            switch (opcao){
+                case "1":
+                    System.out.println("Escreva a descrição do produto");
+                    String descricao=s.nextLine();
+                    System.out.println("Introduza o preço do produto");
+                    double preco=s.nextDouble();
+                    System.out.println("Introduza a quantidade disponivel");
+                    double stock=s.nextDouble();
+                    Produto p = b_dados.novoProduto(username,descricao,preco,stock);
+                    b_dados.addProduto(username,p);
+                    break;
+                case "2":
+
+            }
+
+        }while(true);
     }
 }
