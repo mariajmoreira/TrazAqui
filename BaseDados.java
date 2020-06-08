@@ -246,6 +246,7 @@ public class BaseDados implements Serializable {
         return lojas.containsKey(user);
     }
 
+
     //método que verifica se um determinado código existe
     //utilizador
     public boolean ExisteCodUser(String cod){
@@ -457,8 +458,19 @@ public class BaseDados implements Serializable {
         return e;
     }
 
+    //produto
+    public Produto novoProduto(String username,String descricao, double preco, double stock){
+        String cod = novoCodProduto(username);
+        Produto p= new Produto();
+        p.setCodProd(cod);
+        p.setDescricao(descricao);
+        p.setPreco(preco);
+        p.setStock(stock);
+        return p;
+    }
+
     //entrega
-    public void novaEntrega(String cod, String nome,String codEncomenda,String codUtilizador, String codLoja, double peso, ArrayList<LinhaEncomenda> linhas){
+    public void novaEntrega(String cod, String nome,String codEncomenda,String codUtilizador, String codLoja, double peso, ArrayList<LinhaEncomenda> linhas,double kms){
         Historico h= new Historico();
         h.setCod(cod);
         h.setNome(nome);
@@ -467,6 +479,7 @@ public class BaseDados implements Serializable {
         h.setCodLoja(codLoja);
         h.setPeso(peso);
         h.setLinhas(linhas);
+        h.setKmspercorridos(kms);
         this.entregas.add(h.clone());
     }
 
@@ -654,6 +667,23 @@ public class BaseDados implements Serializable {
         return confirma;
     }
 
+    //produto
+    public String novoCodProduto(String username){
+        int count=0;
+        String cod;
+        LogLoja l=this.lojas.get(username);
+        for(Produto p: l.getCatalogoProdutos().getProdutos()){
+            cod=p.getCodProd().substring(1);
+            if(Integer.parseInt(cod)>count) count=Integer.parseInt(cod);
+        }
+        Random rand=new Random();
+        String confirma="p"+count;
+        while(produtoExiste(username,confirma)){
+            confirma="p"+rand.nextInt(count+2);
+        }
+        return confirma;
+    }
+
     //mudar a localização
     //de um utilizador
     public void setLocalizacaoUtilizador(String cod, double x, double y){
@@ -695,21 +725,6 @@ public class BaseDados implements Serializable {
         }
     }
 
-    //metodo que verifica em que lojas é que um determinado produto existe
-    public Set<String> produtoExisteGlobal(String descricao) throws ProdutoNaoExisteException{
-        Set<String> nomes=new TreeSet<>();
-        for(LogLoja x : this.lojas.values()){
-            for(Produto p : x.getCatalogoProdutos().getProdutos()){
-                if(p.getDescricao().equals(descricao)){
-                    nomes.add(x.getNome());
-                }
-            }
-        }
-        if (nomes.isEmpty()) throw new ProdutoNaoExisteException("O produto não existe!");
-
-        return nomes;
-    }
-
     //metodo que verifica se um deteminado produto existe
     public boolean produtoExiste(String user, String CodProd){
         LogLoja log=this.lojas.get(user);
@@ -721,23 +736,14 @@ public class BaseDados implements Serializable {
         return false;
     }
 
-    //método que adiciona um novo produto ou atualiza o stock de uma determinada loja
-    public void addProduto(String user, Produto novo) throws LojaNaoExisteException {
-        if (!ExisteLoja(user))
-            throw new LojaNaoExisteException("A Loja não existe");
-        LogLoja l = this.lojas.get(user);
-        ArrayList<Produto> p = l.getCatalogoProdutos().getProdutos();
-        if (produtoExiste(user, novo.getCodProd())) {
-            for (Produto pr : p) {
-                if (pr.getCodProd().equals(novo.getCodProd())) {
-                    pr.setStock(pr.getStock()+novo.getStock());
-                }
-            }
-        } else {
-            p.add(novo);
-            CatalogoProdutos c= new CatalogoProdutos(l.getCodLoja(),p);
-            l.setCatalogoProdutos(c);
-        }
+    //método que adiciona um novo produto ao catalogo de uma determinada loja
+    public void addProduto(String user,Produto p){
+        LogLoja log=this.lojas.get(user);
+        CatalogoProdutos cp=log.getCatalogoProdutos();
+        ArrayList<Produto> pr=cp.getProdutos();
+        pr.add(p);
+        cp.setProdutos(pr);
+        log.setCatalogoProdutos(cp);
     }
 
     //método que remove um produto de uma determinada loja
@@ -1214,5 +1220,65 @@ public class BaseDados implements Serializable {
                 hist=h;
         }
         return hist;
+    }
+
+    //método para que conta o número de encomendas que um utilizador fez
+    public int contaHistoricoUser(String cod) {
+        ArrayList<Historico> hist = new ArrayList<>();
+        for (Historico h: this.historico.values()){
+            if(h.getcodUtilizador().equals(cod))
+                hist.add(h);
+        }
+        return hist.size();
+    }
+
+    //listagem do top10 de utilizadores com mais encomendas feitas
+    public List<LogUtilizador> top10utilizadores(){
+        List<LogUtilizador> res= new ArrayList<>();
+        Comparator<LogUtilizador> cmpr= (u1,u2)-> Integer.compare(contaHistoricoUser(u2.getCodUtilizador()), contaHistoricoUser(u1.getCodUtilizador()));
+        Set<LogUtilizador> ret=new TreeSet<>(cmpr);
+        double counter=0;
+        for(LogUtilizador u: this.utilizadores.values()){
+            ret.add(u.clone());
+        }
+        Iterator it =ret.iterator();
+        while(it.hasNext() && counter <10){
+            LogUtilizador lu= (LogUtilizador) it.next();
+            res.add(lu.clone());
+            counter++;
+        }
+        return res;
+    }
+
+    //método que conta o número total de kms percorridos que uma empresa transportadora fez
+    public double contaKmsTrans(String cod){
+        List<Historico> hist= new ArrayList<>();
+        for(Historico h: this.historico.values()){
+            if(h.getCod().equals(cod)){
+                hist.add(h);
+            }
+        }
+        double count=0;
+        for(Historico h: hist){
+            count+=h.getKmspercorridos();
+        }
+        return count;
+    }
+
+    public List<LogTransportadora> top10transportadoras(){
+        List<LogTransportadora> res=new ArrayList<>();
+        Comparator<LogTransportadora> cmpr= Comparator.comparingDouble(t -> contaKmsTrans(t.getCodEmpresa()));
+        Set<LogTransportadora> ret= new TreeSet<>(cmpr);
+        double count=0;
+        for(LogTransportadora t: this.transportadoras.values()){
+            ret.add(t.clone());
+        }
+        Iterator it= ret.iterator();
+        while (it.hasNext()&& count<10){
+            LogTransportadora t=(LogTransportadora) it.next();
+            res.add(t.clone());
+            count++;
+        }
+        return res;
     }
 }
